@@ -9,7 +9,7 @@ const entry = path.resolve(root, 'index.html')
 export default defineConfig(({ mode }) => {
   let base = process.env.VITE_BASE
   if (!base) {
-    if (mode === 'pages') base = '/countdown-clock/findmatch/'
+    if (mode === 'pages') base = '/findmatch/'
     else if (mode === 'android') base = './'
     else base = mode === 'production' ? './' : '/'
   }

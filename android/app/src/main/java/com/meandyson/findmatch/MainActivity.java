@@ -5,11 +5,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.webkit.WebViewAssetLoader;
+
 public class MainActivity extends Activity {
+    private static final String START_URL = "https://appassets.androidplatform.net/index.html";
     private WebView webView;
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -22,12 +27,24 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
-        settings.setAllowFileAccess(true);
+        settings.setAllowFileAccess(false);
         settings.setUseWideViewPort(true);
         settings.setLoadWithOverviewMode(true);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        final WebViewAssetLoader assetLoader =
+                new WebViewAssetLoader.Builder()
+                        .addPathHandler("/", new WebViewAssetLoader.AssetsPathHandler(this))
+                        .build();
+
         webView.setWebViewClient(
                 new WebViewClient() {
+                    @Override
+                    public WebResourceResponse shouldInterceptRequest(
+                            WebView view, WebResourceRequest request) {
+                        return assetLoader.shouldInterceptRequest(request.getUrl());
+                    }
+
                     @Override
                     public void onPageFinished(WebView view, String url) {
                         view.evaluateJavascript(
@@ -43,7 +60,7 @@ public class MainActivity extends Activity {
         if (savedInstanceState != null) {
             webView.restoreState(savedInstanceState);
         } else {
-            webView.loadUrl("file:///android_asset/index.html");
+            webView.loadUrl(START_URL);
         }
     }
 
