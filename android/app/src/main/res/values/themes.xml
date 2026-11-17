@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.FindMatch" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#E3F2FF</item>
+        <item name="android:navigationBarColor">#121110</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

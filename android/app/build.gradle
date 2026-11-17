@@ -1,0 +1,42 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.meandyson.findmatch"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.meandyson.findmatch"
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName "0.1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+tasks.register("syncWeb", Copy) {
+    from("${rootDir}/../dist")
+    into("${projectDir}/src/main/assets")
+    doFirst {
+        if (!file("${rootDir}/../dist").exists()) {
+            throw new GradleException("Run: npm run build:android && npm run sync:android")
+        }
+    }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn("syncWeb")
+}

@@ -1,0 +1,176 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #c8d4e4;
+  color: #1a1a1a;
+  font-family:
+    system-ui,
+    -apple-system,
+    'SF Pro Display',
+    'SF Pro Text',
+    'Segoe UI',
+    'PingFang SC',
+    'Microsoft YaHei',
+    sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+@layer components {
+  .ios-mesh {
+    background:
+      radial-gradient(ellipse 85% 55% at 15% 8%, rgba(147, 197, 253, 0.55), transparent 52%),
+      radial-gradient(ellipse 75% 50% at 88% 22%, rgba(110, 231, 183, 0.42), transparent 48%),
+      radial-gradient(ellipse 80% 60% at 55% 100%, rgba(244, 114, 182, 0.28), transparent 55%),
+      linear-gradient(168deg, #e3f2ff 0%, #f4f0ff 42%, #e8faf0 100%);
+  }
+
+  .glass-shell {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 32px 64px rgba(15, 23, 42, 0.12),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .glass-panel {
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.52);
+    backdrop-filter: blur(28px) saturate(185%);
+    -webkit-backdrop-filter: blur(28px) saturate(185%);
+    box-shadow:
+      0 8px 32px rgba(15, 23, 42, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .glass-panel-sm {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.48);
+    backdrop-filter: blur(22px) saturate(175%);
+    -webkit-backdrop-filter: blur(22px) saturate(175%);
+    box-shadow:
+      0 4px 16px rgba(15, 23, 42, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  .glass-bar {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.62);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
+  }
+
+  .glass-nav {
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(44px) saturate(200%);
+    -webkit-backdrop-filter: blur(44px) saturate(200%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  .glass-row {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+  }
+
+  .glass-row-active:active {
+    background: rgba(255, 255, 255, 0.52);
+  }
+
+  .glass-sheet {
+    border-radius: 1.35rem 1.35rem 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-bottom: none;
+    background: rgba(255, 255, 255, 0.78);
+    backdrop-filter: blur(36px) saturate(195%);
+    -webkit-backdrop-filter: blur(36px) saturate(195%);
+    box-shadow: 0 -12px 48px rgba(15, 23, 42, 0.1);
+  }
+
+  .glass-input {
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.42);
+    backdrop-filter: blur(18px) saturate(160%);
+    -webkit-backdrop-filter: blur(18px) saturate(160%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+
+  .glass-scrim {
+    background: rgba(30, 30, 35, 0.22);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+  }
+
+  .glass-bubble-them {
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.74);
+    color: #1a1a1a;
+    backdrop-filter: blur(16px) saturate(170%);
+    -webkit-backdrop-filter: blur(16px) saturate(170%);
+    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06);
+  }
+
+  .glass-primary-btn {
+    background: rgba(62, 181, 117, 0.88);
+    color: #fff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow:
+      0 4px 16px rgba(62, 181, 117, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .tab-nav-aurora::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -40%;
+    right: -40%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #22d3ee,
+      #3eb575,
+      #c084fc,
+      #f472b6,
+      #fbbf24,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: tab-aurora-slide 4s linear infinite;
+    opacity: 0.85;
+  }
+}
+
+@keyframes tab-aurora-slide {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
