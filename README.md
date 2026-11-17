@@ -1,6 +1,6 @@
 # 寻伴 FindMatch
 
-陌陌式 **附近交友** 纯前端演示（React 18 + Vite + Tailwind）。用户数据、聊天、会员等全部存于浏览器 `localStorage`，无后端。
+真实相亲平台 **附近交友** 纯前端演示（React 18 + Vite + Tailwind）。用户数据、聊天、会员等全部存于浏览器 `localStorage`，无后端。
 
 ## 在线预览
 
