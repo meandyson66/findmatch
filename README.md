@@ -39,6 +39,13 @@ npm run dev
 - 首页附近/推荐、筛选与城市、资料卡与默契测试
 - 实名认证后发言、会员充值分级特权
 - 资料：学历、工作、收入等
+- **检查更新**：对照线上 `version.json`；「我的」→「检查更新」
+
+### 发布新版本
+
+1. 修改根目录 **`app-version.json`**（`versionCode` 递增，更新说明与 `apkUrl`）
+2. `npm run pages:bundle` 并 push main
+3. `npm run sync:android` 打 APK，发 GitHub Release
 
 ---
 

@@ -3,6 +3,7 @@ import {
   ChevronRight,
   Crown,
   Eye,
+  Download,
   HelpCircle,
   Pencil,
   Settings,
@@ -23,6 +24,7 @@ import { VipBadge } from '../components/VipBadge'
 import { VipCenterSheet } from '../components/me/VipCenterSheet'
 import { getVipPerks, getNextTier, vipProgress } from '../data/vip'
 import { isIdentityVerified } from '../utils/identity'
+import { getCurrentVersionLabel } from '../utils/updateCheck'
 import { formatFans, formatRelative } from '../utils/formatTime'
 
 const MENU = [
@@ -32,6 +34,7 @@ const MENU = [
   { key: 'viewers', icon: Eye, label: '谁看过我' },
   { key: 'settings', icon: Settings, label: '设置' },
   { key: 'help', icon: HelpCircle, label: '帮助与反馈' },
+  { key: 'update', icon: Download, label: '检查更新' },
 ]
 
 const TAG_POOL = ['探店', '电影', '美食', '健身', '旅行', '摄影', '音乐', '游戏']
@@ -86,7 +89,7 @@ function profileToForm(u) {
   }
 }
 
-export function MePage({ onOpenChat }) {
+export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessage }) {
   const {
     state,
     updateUser,
@@ -128,11 +131,19 @@ export function MePage({ onOpenChat }) {
     return () => clearTimeout(t)
   }, [toast])
 
+  useEffect(() => {
+    if (updateMessage) showToast(updateMessage)
+  }, [updateMessage])
+
   const showToast = (msg) => setToast(msg)
 
   const identityOk = isIdentityVerified(u)
 
   const openPanel = (key) => {
+    if (key === 'update') {
+      onCheckUpdate?.()
+      return
+    }
     if (key === 'identity') {
       openRealNameVerify()
       return
@@ -409,6 +420,11 @@ export function MePage({ onOpenChat }) {
                   {u.profileViewsUnread}
                 </span>
               )}
+              {key === 'update' && (
+                <span className="mr-1 text-[10px] text-momo-sub">
+                  {updateChecking ? '检查中…' : getCurrentVersionLabel()}
+                </span>
+              )}
               <ChevronRight className="h-4 w-4 text-momo-sub" />
             </button>
           ))}
@@ -551,6 +567,9 @@ export function MePage({ onOpenChat }) {
       </SheetModal>
 
       <SheetModal open={panel === 'settings'} title="设置" onClose={() => setPanel(null)}>
+        <p className="border-b border-white/45 px-4 py-2.5 text-[11px] text-momo-sub">
+          当前版本 {getCurrentVersionLabel()}
+        </p>
         <div className="py-1">
           <ToggleRow
             label="新消息通知"
