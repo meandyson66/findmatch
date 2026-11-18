@@ -1,10 +1,11 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
-import { TAB_ACCENT, TABS } from './nav/tabConfig'
+import { useHorizontalTabSwipe } from '../hooks/useHorizontalTabSwipe'
+import { TAB_ACCENT, TABS, shiftTabId } from './nav/tabConfig'
 import { TabDockIcon } from './nav/TabDockIcon'
 
-const spring = { type: 'spring', stiffness: 520, damping: 34, mass: 0.85 }
+const spring = { type: 'spring', stiffness: 480, damping: 26, mass: 0.82 }
 
 export function BottomNav() {
   const { state, patch } = useApp()
@@ -21,8 +22,23 @@ export function BottomNav() {
 
   const activeAccent = TAB_ACCENT[state.tab] ?? TAB_ACCENT.home
 
+  const shiftTab = useCallback(
+    (delta) => {
+      const next = shiftTabId(state.tab, delta)
+      if (next) patch({ tab: next })
+    },
+    [patch, state.tab]
+  )
+
+  const dockSwipeRef = useHorizontalTabSwipe(
+    true,
+    () => shiftTab(1),
+    () => shiftTab(-1),
+    { threshold: 40, ratio: 1.1 }
+  )
+
   return (
-    <div className="tab-liquid-dock-wrap">
+    <div ref={dockSwipeRef} className="tab-liquid-dock-wrap">
       <nav
         className="tab-liquid-dock tab-nav-aurora"
         aria-label="主导航"
@@ -66,7 +82,7 @@ export function BottomNav() {
                   {active && (
                     <motion.span
                       layoutId="tab-active-pill"
-                      className="tab-dock-pill absolute inset-x-0.5 bottom-0 top-0"
+                      className="tab-dock-pill tab-dock-pill-oval absolute inset-x-0.5 bottom-0.5 top-0.5"
                       style={{
                         boxShadow: `0 12px 28px rgba(${accent.glow},0.22), inset 0 2px 0 rgba(255,255,255,0.92), inset 0 -8px 16px rgba(255,255,255,0.4)`,
                       }}

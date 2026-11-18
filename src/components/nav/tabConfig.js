@@ -20,3 +20,9 @@ export function tabIndex(id) {
   const i = MAIN_TAB_IDS.indexOf(id)
   return i >= 0 ? i : 0
 }
+
+export function shiftTabId(current, delta) {
+  const next = tabIndex(current) + delta
+  if (next < 0 || next >= MAIN_TAB_IDS.length) return null
+  return MAIN_TAB_IDS[next]
+}
