@@ -2,6 +2,7 @@
  * 会员 Tab：展示会员用户特权（非充值页）
  * 前 5 位高级会员固定顺序，其余从池子中随机抽取
  */
+import { resolveDemoAvatar } from './demoAvatars'
 import { getVipTier } from './vip'
 
 /** 固定展示的高级会员（至尊 / 钻石为主） */
@@ -245,6 +246,7 @@ function enrichMember(m) {
     online: m.online ?? n % 4 !== 0,
     soulTags: m.soulTags ?? ['认真交友', tier.name + '会员'],
     bio: m.bio ?? `${m.city} · ${tier.name}会员`,
+    avatarImage: m.avatarImage ?? resolveDemoAvatar(m.id, m.gender),
   }
 }
 
@@ -277,6 +279,7 @@ export function findVipMemberProfile(id) {
     marital: row.marital,
     vipInvest: row.vipInvest,
     vipLevel: row.vipLevel,
+    avatarImage: row.avatarImage,
   }
 }
 

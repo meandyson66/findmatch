@@ -1,12 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Heart, MessageCircle, Pause, Play, Sparkles } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { MomoAvatar } from '../MomoAvatar'
 import { HOME_FEED_BOARDS, loadHomeFeed } from '../../data/homeFeed'
 import { formatRelative } from '../../utils/formatTime'
-
-function authorInitial(name) {
-  return (name || '?').slice(0, 1)
-}
 
 function slideBg(post, board) {
   const [a, b] = board?.frame ?? ['#3EB575', '#5B8FB9']
@@ -93,14 +90,12 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
             <div className="promo-slide-glass absolute inset-0" aria-hidden />
             <div className="relative z-[1] flex min-h-[108px] flex-col">
               <div className="flex gap-2.5">
-                <div
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white"
-                  style={{
-                    background: `linear-gradient(145deg, ${post.accent}ee, ${post.accent}99)`,
-                  }}
-                >
-                  {authorInitial(post.author)}
-                </div>
+                <MomoAvatar
+                    nickname={post.author}
+                    accent={post.accent}
+                    size={36}
+                    imageUrl={post.avatarImage}
+                  />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold text-white drop-shadow">
                     {post.author}

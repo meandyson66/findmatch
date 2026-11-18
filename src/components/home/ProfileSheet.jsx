@@ -22,7 +22,13 @@ export function ProfileSheet({ user, open, onClose, onGreet, isFollowing, onTogg
       >
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
-            <MomoAvatar nickname={user.nickname} accent={user.accent} size={72} online={user.online} />
+            <MomoAvatar
+              nickname={user.nickname}
+              accent={user.accent}
+              size={72}
+              online={user.online}
+              imageUrl={user.avatarImage}
+            />
             <div>
               <h2 className="text-lg font-semibold text-momo-text">
                 {user.nickname} · {user.age}

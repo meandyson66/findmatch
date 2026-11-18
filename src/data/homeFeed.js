@@ -1,3 +1,5 @@
+import { resolveDemoAvatar } from './demoAvatars'
+
 /**
  * 首页推荐下方 · 客人信息流（多板块）
  * 板块：日常精选 / 讨论话题 / 群主交流 等，后续可接接口或 localStorage
@@ -124,13 +126,36 @@ export const DEFAULT_HOME_FEED = [
   },
 ]
 
+function enrichPost(p, idx) {
+  const gender =
+    p.gender ??
+    (p.authorBadge === '红娘' || String(p.author).includes('红娘')
+      ? '女'
+      : p.authorBadge === '群主'
+        ? idx % 2 === 0
+          ? '女'
+          : '男'
+        : idx % 2 === 0
+          ? '女'
+          : '男')
+  return {
+    ...p,
+    gender,
+    avatarImage: p.avatarImage ?? resolveDemoAvatar(p.id ?? p.author, gender),
+  }
+}
+
+function enrichFeed(posts) {
+  return posts.map(enrichPost)
+}
+
 export function loadHomeFeed() {
   try {
     const raw = localStorage.getItem(FEED_STORAGE_KEY)
-    if (!raw) return DEFAULT_HOME_FEED
+    if (!raw) return enrichFeed(DEFAULT_HOME_FEED)
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_HOME_FEED
+    return Array.isArray(parsed) && parsed.length ? enrichFeed(parsed) : enrichFeed(DEFAULT_HOME_FEED)
   } catch {
-    return DEFAULT_HOME_FEED
+    return enrichFeed(DEFAULT_HOME_FEED)
   }
 }

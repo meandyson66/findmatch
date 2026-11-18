@@ -27,6 +27,7 @@ export function VipMarqueeAvatar({
             accent={member.accent}
             size={inner}
             online={member.online}
+            imageUrl={member.avatarImage}
           />
         </div>
       </div>

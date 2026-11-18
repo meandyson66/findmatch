@@ -41,6 +41,7 @@ export function MatchmakerDropletCard({ matchmaker, locked, index, onBook }) {
                 accent={a}
                 size={64}
                 emoji={matchmaker.emoji}
+                imageUrl={matchmaker.avatarImage}
               />
             </div>
             <Droplets

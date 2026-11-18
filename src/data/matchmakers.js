@@ -1,3 +1,5 @@
+import { resolveDemoAvatar, resolveDemoScene } from './demoAvatars'
+
 /** 红娘演示数据（纯前端） */
 export const MATCHMAKERS = [
   {
@@ -12,6 +14,7 @@ export const MATCHMAKERS = [
     vipOnly: false,
     accent: ['#FDA4AF', '#F472B6'],
     emoji: '🌸',
+    avatarImage: resolveDemoAvatar('m1', '女'),
   },
   {
     id: 'm2',
@@ -26,6 +29,7 @@ export const MATCHMAKERS = [
     minVipLevel: 2,
     accent: ['#FCD34D', '#F59E0B'],
     emoji: '✨',
+    avatarImage: resolveDemoAvatar('m2', '女'),
   },
   {
     id: 'm3',
@@ -39,6 +43,7 @@ export const MATCHMAKERS = [
     vipOnly: false,
     accent: ['#7DD3FC', '#38BDF8'],
     emoji: '💎',
+    avatarImage: resolveDemoAvatar('m3', '女'),
   },
 ]
 

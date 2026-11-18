@@ -158,6 +158,7 @@ export function MessagesPage({ onOpenChat }) {
                   accent={user?.accent ?? '#3EB575'}
                   size={50}
                   online={user?.online}
+                  imageUrl={user?.avatarImage}
                 />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1">

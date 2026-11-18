@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.4",
-  "versionCode": 5,
-  "releaseNotes": "修复安卓无法检测更新：改为从线上下发版本信息；下载 APK 调起系统浏览器。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.4/app-release.apk",
+  "versionName": "0.1.5",
+  "versionCode": 6,
+  "releaseNotes": "演示头像与场景图接入真实素材；首页推荐、交流广场、会员、红娘、消息与我全面展示人像。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.5/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

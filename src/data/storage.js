@@ -82,7 +82,7 @@ function normalizeUser(raw = {}) {
     city,
     avatarAccent: raw.avatarAccent ?? DEFAULT_USER.avatarAccent,
     avatarEmoji: raw.avatarEmoji ?? null,
-    avatarImage: raw.avatarImage ?? null,
+    avatarImage: raw.avatarImage ?? DEFAULT_USER.avatarImage ?? null,
     education: raw.education ?? DEFAULT_USER.education,
     job: raw.job ?? DEFAULT_USER.job,
     jobTitle: raw.jobTitle ?? DEFAULT_USER.jobTitle,

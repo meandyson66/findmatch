@@ -1,7 +1,8 @@
 import { DEFAULT_PROFILE_EXTRA } from './profileOptions'
+import { resolveDemoAvatar } from './demoAvatars'
 
 /** 附近的人（陌陌式资料字段） */
-export const NEARBY_USERS = [
+const _NEARBY_USERS_RAW = [
   {
     id: 'r1',
     nickname: '夜航员Luna',
@@ -112,6 +113,11 @@ export const NEARBY_USERS = [
   },
 ]
 
+export const NEARBY_USERS = _NEARBY_USERS_RAW.map((u) => ({
+  ...u,
+  avatarImage: resolveDemoAvatar(u.id, u.gender),
+}))
+
 /** @deprecated 兼容旧聊天逻辑 */
 export const RADAR_PROFILES = NEARBY_USERS.map((u) => ({
   ...u,
@@ -156,7 +162,7 @@ export const DEFAULT_USER = {
   nickname: '小鹿',
   avatarAccent: '#3EB575',
   avatarEmoji: null,
-  avatarImage: null,
+  avatarImage: resolveDemoAvatar('me-default', '男'),
   age: 25,
   gender: '男',
   province: '上海市',

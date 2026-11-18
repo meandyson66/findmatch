@@ -22,13 +22,24 @@ function RecommendCard({ user, onOpen }) {
       onClick={() => onOpen(user.id)}
       className="glass-panel-sm overflow-hidden text-left"
     >
-      <div
-        className="flex h-36 items-end p-2"
-        style={{ background: `linear-gradient(160deg, ${user.accent}55, ${user.accent})` }}
-      >
-        <span className="rounded bg-black/25 px-1.5 py-0.5 text-[10px] text-white">
+      <div className="relative h-36 overflow-hidden">
+        {user.avatarImage ? (
+          <img src={user.avatarImage} alt="" className="h-full w-full object-cover object-top" />
+        ) : (
+          <div
+            className="h-full w-full"
+            style={{ background: `linear-gradient(160deg, ${user.accent}55, ${user.accent})` }}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+        <span className="absolute bottom-2 left-2 rounded bg-black/35 px-1.5 py-0.5 text-[10px] text-white backdrop-blur-sm">
           {user.distanceKm}km
         </span>
+        {user.online && (
+          <span className="absolute right-2 top-2 rounded-full bg-momo px-1.5 py-0.5 text-[9px] text-white">
+            在线
+          </span>
+        )}
       </div>
       <div className="p-2">
         <p className="text-sm font-medium text-momo-text">
