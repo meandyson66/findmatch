@@ -2,11 +2,20 @@ const fs = require('node:fs')
 const path = require('node:path')
 
 const root = path.join(__dirname, '..')
-const dist = path.join(root, 'dist')
+const dist = path.join(root, 'dist-android')
 const assets = path.join(root, 'android', 'app', 'src', 'main', 'assets')
 
 if (!fs.existsSync(dist)) {
-  console.error('Missing dist/. Run: npm run build:android')
+  console.error('Missing dist-android/. Run: npm run build:android')
+  process.exit(1)
+}
+
+const indexHtml = path.join(dist, 'index.html')
+const indexBody = fs.readFileSync(indexHtml, 'utf8')
+if (!indexBody.includes('./assets/') || indexBody.includes('src="/findmatch/')) {
+  console.error(
+    'dist-android/index.html is not an Android build (need ./assets/). Re-run: npm run build:android'
+  )
   process.exit(1)
 }
 

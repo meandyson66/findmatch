@@ -18,9 +18,19 @@ export default defineConfig(({ mode }) => {
     else base = mode === 'production' ? './' : '/'
   }
 
+  const outDir =
+    mode === 'android' ? 'dist-android' : mode === 'pages' ? 'dist' : 'dist'
+
   return {
     root,
     base,
+    build: {
+      outDir,
+      emptyOutDir: true,
+      rollupOptions: {
+        input: entry,
+      },
+    },
     define: {
       __APP_VERSION_NAME__: JSON.stringify(appVersion.versionName),
       __APP_VERSION_CODE__: appVersion.versionCode,
@@ -28,11 +38,6 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     optimizeDeps: {
       entries: [entry],
-    },
-    build: {
-      rollupOptions: {
-        input: entry,
-      },
     },
     server: {
       port: 5173,

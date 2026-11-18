@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.10",
-  "versionCode": 11,
-  "releaseNotes": "Tab 页椭圆胶囊滑动切换，带左右弹性回弹；底栏选中高亮改为椭圆并加强弹簧动效；优化横滑与纵向滚动共存。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.10/app-release.apk",
+  "versionName": "0.1.11",
+  "versionCode": 12,
+  "releaseNotes": "修复安卓打开白屏（打包资源路径被 Pages 构建覆盖）；Tab 椭圆滑动与弹性切换。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.11/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

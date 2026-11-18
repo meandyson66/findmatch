@@ -10,8 +10,8 @@ android {
         applicationId "com.meandyson.findmatch"
         minSdk 26
         targetSdk 35
-        versionCode 11
-        versionName "0.1.10"
+        versionCode 12
+        versionName "0.1.11"
     }
 
     buildTypes {
@@ -28,11 +28,19 @@ android {
 }
 
 tasks.register("syncWeb", Copy) {
-    from("${rootDir}/../dist")
+    from("${rootDir}/../dist-android")
     into("${projectDir}/src/main/assets")
     doFirst {
-        if (!file("${rootDir}/../dist").exists()) {
+        def webDist = file("${rootDir}/../dist-android")
+        def indexHtml = new File(webDist, "index.html")
+        if (!webDist.exists() || !indexHtml.exists()) {
             throw new GradleException("Run: npm run build:android && npm run sync:android")
+        }
+        def html = indexHtml.getText("UTF-8")
+        if (!html.contains("./assets/") || html.contains("src=\"/findmatch/")) {
+            throw new GradleException(
+                "dist-android is not an Android web build. Run: npm run build:android"
+            )
         }
     }
 }
