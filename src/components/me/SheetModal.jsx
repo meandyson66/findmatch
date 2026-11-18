@@ -1,12 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 
-export function SheetModal({ open, title, onClose, children, tall }) {
+export function SheetModal({ open, title, onClose, children, tall, pinToViewport }) {
+  const overlayPos = pinToViewport ? 'fixed' : 'absolute'
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="glass-scrim absolute inset-0 z-50 flex flex-col justify-end"
+          className={`glass-scrim ${overlayPos} inset-0 z-50 flex flex-col justify-end`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

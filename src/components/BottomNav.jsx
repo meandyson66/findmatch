@@ -1,23 +1,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { useApp } from '../context/AppContext'
+import { TAB_ACCENT, TABS } from './nav/tabConfig'
 import { TabDockIcon } from './nav/TabDockIcon'
-
-const TABS = [
-  { id: 'home', label: '首页' },
-  { id: 'vip', label: '会员' },
-  { id: 'matchmaker', label: '红娘' },
-  { id: 'messages', label: '消息' },
-  { id: 'me', label: '我的' },
-]
-
-const TAB_ACCENT = {
-  home: { a: '#3EB575', b: '#22D3EE', glow: '62,181,117' },
-  vip: { a: '#E8B84A', b: '#F59E0B', glow: '232,184,74' },
-  matchmaker: { a: '#F472B6', b: '#FB7185', glow: '244,114,182' },
-  messages: { a: '#C084FC', b: '#F472B6', glow: '168,85,247' },
-  me: { a: '#FBBF24', b: '#FB923C', glow: '251,191,36' },
-}
 
 const spring = { type: 'spring', stiffness: 520, damping: 34, mass: 0.85 }
 
@@ -161,7 +146,7 @@ export function BottomNav() {
                         : undefined,
                       WebkitBackgroundClip: active ? 'text' : undefined,
                       WebkitTextFillColor: active ? 'transparent' : undefined,
-                      color: active ? undefined : '#8E8E93',
+                      color: active ? undefined : '#94A3B8',
                       textShadow: active ? undefined : '0 1px 0 rgba(255,255,255,0.65)',
                     }}
                   >

@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.8",
-  "versionCode": 9,
-  "releaseNotes": "红娘 Tab 图标：双手靠拢后化为爱心握手；其余 Tab 切换动效与液态底栏保留。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.8/app-release.apk",
+  "versionName": "0.1.9",
+  "versionCode": 10,
+  "releaseNotes": "深色鲜艳主题；底部 Tab 左右滑动与水滴融合动效；交流广场可发文字/图/视频/语音；红娘私信与演示视频；会员流光边框加速；首页与广场动效等。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.9/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

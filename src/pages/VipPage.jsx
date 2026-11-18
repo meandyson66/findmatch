@@ -1,4 +1,4 @@
-import { Crown, RefreshCw } from 'lucide-react'
+import { Crown, RefreshCw, Search, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ProfileSheet } from '../components/home/ProfileSheet'
 import { SoulQuizModal } from '../components/radar/SoulQuizModal'
@@ -12,6 +12,17 @@ import {
 import { chatIdForRadar } from '../data/storage'
 import { getVipPerks } from '../data/vip'
 import { isIdentityVerified } from '../utils/identity'
+
+function filterVipMembers(list, query) {
+  const q = query.trim().toLowerCase()
+  if (!q) return list
+  return list.filter((m) => {
+    const hay = `${m.nickname}${m.city ?? ''}${m.bio ?? ''}${m.id ?? ''}${
+      m.jobTitle ?? ''
+    }${m.tier?.name ?? ''}${m.gender ?? ''}`.toLowerCase()
+    return hay.includes(q)
+  })
+}
 
 export function VipPage({ onOpenChat }) {
   const {
@@ -31,10 +42,16 @@ export function VipPage({ onOpenChat }) {
   const [profileMemberId, setProfileMemberId] = useState(null)
   const [quizOpen, setQuizOpen] = useState(false)
   const [targetId, setTargetId] = useState(null)
+  const [search, setSearch] = useState('')
 
   const members = useMemo(
     () => buildVipMemberList(shuffleSeed).members,
     [shuffleSeed]
+  )
+
+  const filteredMembers = useMemo(
+    () => filterVipMembers(members, search),
+    [members, search]
   )
 
   const showToast = (msg) => {
@@ -149,13 +166,33 @@ export function VipPage({ onOpenChat }) {
           </button>
         </div>
         <p className="text-[10px] text-momo-sub">平台会员 · 点头像查看资料并沟通</p>
+        <div className="glass-input mt-2 flex items-center gap-2 px-3 py-2">
+          <Search className="h-4 w-4 shrink-0 text-momo-sub" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="搜索昵称 / 城市 / ID号"
+            className="w-full bg-transparent text-sm text-momo-text outline-none placeholder:text-momo-sub"
+          />
+          {search && (
+            <button type="button" onClick={() => setSearch('')} className="text-momo-sub">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
         <div className="glass-panel mt-2 overflow-hidden px-2 py-1">
-          {members.map((m) => (
-            <VipMemberCard key={m.id} member={m} onPress={openProfile} />
-          ))}
+          {filteredMembers.length === 0 ? (
+            <p className="px-3 py-10 text-center text-sm text-momo-sub">
+              {search.trim() ? '没有匹配的会员' : '暂无会员展示'}
+            </p>
+          ) : (
+            filteredMembers.map((m) => (
+              <VipMemberCard key={m.id} member={m} onPress={openProfile} />
+            ))
+          )}
         </div>
       </div>
 

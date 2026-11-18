@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { NEARBY_USERS } from '../data/mockData'
 import { findVipMemberProfile } from '../data/vipMembers'
 import { RECHARGE_PACKAGES, getVipPerks } from '../data/vip'
-import { chatIdForRadar, loadState, resetState, saveState } from '../data/storage'
+import { MATCHMAKERS } from '../data/matchmakers'
+import { chatIdForMatchmaker, chatIdForRadar, loadState, resetState, saveState } from '../data/storage'
 import { RealNameVerifySheet } from '../components/me/RealNameVerifySheet'
 import { isIdentityVerified } from '../utils/identity'
 
@@ -238,6 +239,44 @@ export function AppProvider({ children }) {
     }, 800)
   }, [sendMessage])
 
+  const ensureMatchmakerChat = useCallback((matchmakerId) => {
+    const m = MATCHMAKERS.find((x) => x.id === matchmakerId)
+    if (!m) return null
+    const chatId = chatIdForMatchmaker(matchmakerId)
+    setState((s) => {
+      if (s.chats[chatId]) return s
+      const now = Date.now()
+      return {
+        ...s,
+        chats: {
+          ...s.chats,
+          [chatId]: {
+            partnerId: matchmakerId,
+            source: 'matchmaker',
+            title: `红娘 · ${m.name}`,
+            messages: [
+              {
+                id: newId(),
+                text: '你已与红娘建立私信专线（演示）',
+                from: 'system',
+                at: now,
+              },
+              {
+                id: newId(),
+                text: `你好呀～我是${m.name}，想先文字聊聊你的择偶方向，也可以随时点「视频」进演示视频房喔🌸`,
+                from: 'them',
+                at: now + 1,
+              },
+            ],
+            updatedAt: now,
+            unread: 1,
+          },
+        },
+      }
+    })
+    return chatId
+  }, [])
+
   const markIcebreakerUsed = useCallback(() => {}, [])
 
   const setHomeFilters = useCallback((partial) => {
@@ -333,6 +372,7 @@ export function AppProvider({ children }) {
       completeSoulQuiz,
       sendMessage,
       appendSimReply,
+      ensureMatchmakerChat,
       markIcebreakerUsed,
       markChatRead,
       setHomeFilters,
@@ -366,6 +406,7 @@ export function AppProvider({ children }) {
       completeSoulQuiz,
       sendMessage,
       appendSimReply,
+      ensureMatchmakerChat,
       markIcebreakerUsed,
       markChatRead,
       setHomeFilters,

@@ -2,7 +2,7 @@ import { Bell, ChevronRight, MoreHorizontal, Pin, Search, Trash2, X } from 'luci
 import { useMemo, useState } from 'react'
 import { MomoAvatar } from '../components/MomoAvatar'
 import { SheetModal } from '../components/me/SheetModal'
-import { NEARBY_USERS } from '../data/mockData'
+import { resolveChatPartner } from '../utils/chatPartner'
 import { useApp } from '../context/AppContext'
 import { formatRelative } from '../utils/formatTime'
 
@@ -52,7 +52,7 @@ export function MessagesPage({ onOpenChat }) {
     const q = search.trim().toLowerCase()
     return Object.entries(state.chats)
       .map(([id, chat]) => {
-        const user = NEARBY_USERS.find((u) => u.id === chat.partnerId)
+        const user = resolveChatPartner(chat)
         const pinned = state.chatMeta?.[id]?.pinned
         return {
           id,

@@ -1,14 +1,13 @@
-import { ChevronDown, Filter, RefreshCw, Search, X } from 'lucide-react'
+import { Filter, RefreshCw, Star } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { chatIdForRadar } from '../data/storage'
-import { CityPickerSheet } from '../components/home/CityPickerSheet'
-import { formatUserLocation } from '../data/chinaRegions'
 import { HomeFeedSection } from '../components/home/HomeFeedSection'
 import { HomeSiteFooter } from '../components/home/HomeSiteFooter'
 import { HomePromoShowcase } from '../components/home/HomePromoShowcase'
 import { FilterSheet } from '../components/home/FilterSheet'
 import { ProfileSheet } from '../components/home/ProfileSheet'
 import { SoulQuizModal } from '../components/radar/SoulQuizModal'
+import { AppBrand } from '../components/AppBrand'
 import { ResetButton } from '../components/ResetButton'
 import { useApp } from '../context/AppContext'
 import { getVipPerks } from '../data/vip'
@@ -51,16 +50,11 @@ function RecommendCard({ user, onOpen }) {
   )
 }
 
-function applyFilters(users, filters, query) {
-  const q = query.trim().toLowerCase()
+function applyFilters(users, filters) {
   return users.filter((u) => {
     if (filters.gender !== 'all' && u.gender !== filters.gender) return false
     if (filters.onlineOnly && !u.online) return false
     if (u.distanceKm > filters.maxKm) return false
-    if (q) {
-      const hay = `${u.nickname}${u.bio}${u.soulTags.join('')}`.toLowerCase()
-      if (!hay.includes(q)) return false
-    }
     return true
   })
 }
@@ -76,7 +70,6 @@ export function HomePage({ onOpenChat }) {
     refreshNearby,
     getMergedUser,
     toggleFollow,
-    updateUser,
     openRealNameVerify,
   } = useApp()
   const filters = state.homeFilters ?? { gender: 'all', onlineOnly: false, maxKm: 5 }
@@ -89,8 +82,6 @@ export function HomePage({ onOpenChat }) {
   const [targetId, setTargetId] = useState(null)
   const [profileId, setProfileId] = useState(null)
   const [filterOpen, setFilterOpen] = useState(false)
-  const [cityOpen, setCityOpen] = useState(false)
-  const [search, setSearch] = useState('')
   const [toast, setToast] = useState('')
   const [refreshing, setRefreshing] = useState(false)
 
@@ -100,8 +91,8 @@ export function HomePage({ onOpenChat }) {
   )
 
   const recommend = useMemo(
-    () => applyFilters(merged.filter((u) => u.recommend), filters, search),
-    [merged, filters, search]
+    () => applyFilters(merged.filter((u) => u.recommend), filters),
+    [merged, filters]
   )
 
   const target = merged.find((u) => u.id === targetId)
@@ -180,16 +171,9 @@ export function HomePage({ onOpenChat }) {
   return (
     <div className="relative flex h-full flex-col">
       <header className="glass-bar shrink-0 border-b px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => setCityOpen(true)}
-            className="flex items-center gap-0.5 text-[17px] font-semibold text-momo-text"
-          >
-            {formatUserLocation(state.user)}
-            <ChevronDown className="h-4 w-4 text-momo-sub" />
-          </button>
-          <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <AppBrand className="min-w-0 flex-1" />
+          <div className="flex shrink-0 items-center gap-2">
             <button
               type="button"
               onClick={doRefresh}
@@ -210,20 +194,9 @@ export function HomePage({ onOpenChat }) {
             </button>
           </div>
         </div>
-        <div className="glass-input mt-2 flex items-center gap-2 px-3 py-2">
-          <Search className="h-4 w-4 shrink-0 text-momo-sub" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="搜索昵称 / 标签"
-            className="w-full bg-transparent text-sm text-momo-text outline-none placeholder:text-momo-sub"
-          />
-          {search && (
-            <button type="button" onClick={() => setSearch('')} className="text-momo-sub">
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
+      </header>
+
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <HomePromoShowcase
           onNavigate={(tab) => patch({ tab })}
           onToast={showToast}
@@ -233,10 +206,24 @@ export function HomePage({ onOpenChat }) {
             上次刷新 {formatRelative(state.homeRefreshAt)}
           </p>
         )}
-        <p className="mt-2 text-[13px] font-medium text-momo-text">精选推荐</p>
-      </header>
-
-      <div className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-3 mt-2 flex items-center gap-1">
+          <Star
+            className="home-featured-title-icon h-3.5 w-3.5 text-momo"
+            strokeWidth={2.25}
+            aria-hidden
+          />
+          <p className="home-featured-glow-title" aria-label="精选推荐">
+            {'精选推荐'.split('').map((ch, i) => (
+              <span
+                key={`${ch}-${i}`}
+                className="home-featured-glow-char"
+                style={{ animationDelay: `${i * 0.12}s` }}
+              >
+                {ch}
+              </span>
+            ))}
+          </p>
+        </div>
         {vipPerks.priorityExpose && (
           <p className="mx-3 mt-2 rounded-lg border border-momo/25 bg-momo/10 px-3 py-2 text-center text-[11px] text-momo-dark">
             钻石及以上：你的资料已在推荐位优先展示（演示）
@@ -273,17 +260,6 @@ export function HomePage({ onOpenChat }) {
         onNeedVip={() => {
           showToast('该距离需更高会员等级，请到「我的」充值')
           patch({ tab: 'me' })
-        }}
-      />
-
-      <CityPickerSheet
-        open={cityOpen}
-        onClose={() => setCityOpen(false)}
-        value={{ province: state.user.province, city: state.user.city }}
-        onSelect={({ province, city }) => {
-          updateUser({ province, city })
-          showToast(`已切换到 ${city}`)
-          refreshNearby()
         }}
       />
 

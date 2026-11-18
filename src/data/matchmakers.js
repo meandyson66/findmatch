@@ -46,9 +46,3 @@ export const MATCHMAKERS = [
     avatarImage: resolveDemoAvatar('m3', '女'),
   },
 ]
-
-export const MATCH_SERVICES = [
-  { id: 'basic', title: '基础牵线', desc: '红娘代为介绍 1 位匹配嘉宾', coin: 0, vipLevel: 0 },
-  { id: 'vip', title: '会员专场', desc: '优先匹配 + 资料润色', coin: 50, vipLevel: 1 },
-  { id: 'exclusive', title: '尊享定制', desc: '金牌红娘 7 日跟踪', coin: 200, vipLevel: 3 },
-]

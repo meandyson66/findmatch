@@ -157,3 +157,7 @@ export function chatIdForRadar(profileId) {
 export function chatIdForBottle(bottleId) {
   return `chat-bottle-${bottleId}`
 }
+
+export function chatIdForMatchmaker(matchmakerId) {
+  return `chat-matchmaker-${matchmakerId}`
+}

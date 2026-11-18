@@ -1,9 +1,18 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Heart, MessageCircle, Pause, Play, Sparkles } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Heart, MessageCircle, Sparkles } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MomoAvatar } from '../MomoAvatar'
-import { HOME_FEED_BOARDS, loadHomeFeed } from '../../data/homeFeed'
+import {
+  HOME_FEED_BOARDS,
+  addHomeFeedPost,
+  createUserFeedPost,
+  loadHomeFeed,
+} from '../../data/homeFeed'
+import { useApp } from '../../context/AppContext'
+import { isIdentityVerified } from '../../utils/identity'
 import { formatRelative } from '../../utils/formatTime'
+import { FeedPostBody } from './FeedPostBody'
+import { FEED_PUBLISH_TYPES, FeedPublishSheet } from './FeedPublishSheet'
 
 function slideBg(post, board) {
   const [a, b] = board?.frame ?? ['#3EB575', '#5B8FB9']
@@ -11,9 +20,8 @@ function slideBg(post, board) {
   return `linear-gradient(135deg, ${accent}55 0%, ${a}44 40%, ${b}38 100%)`
 }
 
-function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
+function FeedLiquidWindow({ board, posts, onToast, rollMs, onCompose }) {
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
   const post = posts[index] ?? posts[0]
   const [a, b] = board.frame ?? ['#3EB575', '#5B8FB9']
   const captionTrack = useMemo(() => [...posts, ...posts], [posts])
@@ -27,10 +35,14 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
   )
 
   useEffect(() => {
-    if (paused || posts.length < 2) return undefined
+    if (posts.length < 2) return undefined
     const t = setInterval(() => go(1), rollMs)
     return () => clearInterval(t)
-  }, [paused, posts.length, go, rollMs])
+  }, [posts.length, go, rollMs])
+
+  useEffect(() => {
+    setIndex(0)
+  }, [posts[0]?.id])
 
   if (!post) {
     return (
@@ -57,21 +69,23 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
         aria-hidden
       />
 
-      <div className="relative z-[2] flex items-center justify-between border-b border-white/35 px-3 py-2">
-        <div>
-          <p className="text-[13px] font-semibold text-momo-text">{board.label}</p>
-          <p className="text-[10px] text-momo-sub">{board.desc}</p>
-        </div>
-        {posts.length > 1 && (
+      <div className="relative z-[2] border-b border-white/35 px-3 py-2">
+        <p className="text-[13px] font-semibold text-momo-text">{board.label}</p>
+        <p className="text-[10px] text-momo-sub">{board.desc}</p>
+      </div>
+
+      <div className="relative z-[2] flex flex-wrap items-center gap-1 border-b border-white/30 px-2 py-2">
+        {FEED_PUBLISH_TYPES.map(({ id, label, icon: Icon }) => (
           <button
+            key={id}
             type="button"
-            onClick={() => setPaused((p) => !p)}
-            className="flex items-center gap-0.5 rounded-full border border-white/50 bg-white/35 px-2 py-1 text-[10px] text-momo-sub"
+            onClick={() => onCompose?.(board, id)}
+            className="feed-compose-chip inline-flex items-center gap-0.5"
           >
-            {paused ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
-            {paused ? '继续' : '暂停'}
+            <Icon className="h-3 w-3" />
+            {label}
           </button>
-        )}
+        ))}
       </div>
 
       <div className="promo-liquid-stage relative z-[2] overflow-hidden">
@@ -80,7 +94,7 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
             key={post.id}
             type="button"
             onClick={() => onToast?.('动态详情页预留，后续可接评论与私信')}
-            className="relative block min-h-[132px] w-full overflow-hidden px-3 py-2.5 text-left"
+            className="relative block min-h-[148px] w-full overflow-hidden px-3 py-2.5 text-left"
             style={{ background: slideBg(post, board) }}
             initial={{ opacity: 0, x: 24, filter: 'blur(4px)' }}
             animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
@@ -109,9 +123,7 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
                   {post.topicTag && (
                     <p className="mt-0.5 text-[10px] font-medium text-white/95">{post.topicTag}</p>
                   )}
-                  <p className="mt-1 line-clamp-3 text-[13px] leading-snug text-white/95">
-                    {post.content}
-                  </p>
+                  <FeedPostBody post={post} compact />
                 </div>
               </div>
               <div className="mt-auto flex gap-4 pt-1.5 text-[11px] text-white/90">
@@ -158,7 +170,7 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
 
       {posts.length > 1 && (
         <div className="promo-caption-marquee-mask relative z-[2] border-t border-white/30 py-1.5">
-          <div className={`promo-marquee-track ${paused ? 'promo-marquee-paused' : ''}`}>
+          <div className="promo-marquee-track">
             {captionTrack.map((p, i) => (
               <button
                 key={`${p.id}-cap-${i}`}
@@ -191,15 +203,42 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs }) {
 }
 
 export function HomeFeedSection({ onToast }) {
-  const all = loadHomeFeed()
+  const { state, openRealNameVerify } = useApp()
+  const [feedPosts, setFeedPosts] = useState(() => loadHomeFeed())
+  const [publish, setPublish] = useState(null)
 
   const byBoard = useMemo(() => {
     const map = Object.fromEntries(HOME_FEED_BOARDS.map((b) => [b.id, []]))
-    all.forEach((p) => {
+    feedPosts.forEach((p) => {
       if (map[p.board]) map[p.board].push(p)
     })
     return map
-  }, [all])
+  }, [feedPosts])
+
+  const requestCompose = (board, mediaType) => {
+    if (!isIdentityVerified(state.user)) {
+      onToast?.('实名后可发布到交流广场')
+      openRealNameVerify()
+      return
+    }
+    setPublish({ boardId: board.id, boardLabel: board.label, mediaType })
+  }
+
+  const submitPublish = (payload) => {
+    const entry = createUserFeedPost({
+      board: publish.boardId,
+      user: state.user,
+      ...payload,
+    })
+    const saved = addHomeFeedPost(entry)
+    if (!saved) {
+      onToast?.('保存失败，图片可能过大')
+      return
+    }
+    setFeedPosts(loadHomeFeed())
+    setPublish(null)
+    onToast?.(`已发布到${publish.boardLabel}`)
+  }
 
   const rollIntervals = [4800, 5200, 5600, 5000]
 
@@ -211,8 +250,18 @@ export function HomeFeedSection({ onToast }) {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-40px' }}
       >
-        <Sparkles className="h-3.5 w-3.5 text-momo" />
-        <p className="text-[13px] font-medium text-momo-text">交流广场</p>
+        <Sparkles className="home-plaza-title-icon h-3.5 w-3.5 text-violet-500" aria-hidden />
+        <p className="home-plaza-glow-title" aria-label="交流广场">
+          {'交流广场'.split('').map((ch, i) => (
+            <span
+              key={`${ch}-${i}`}
+              className="home-plaza-glow-char"
+              style={{ animationDelay: `${i * 0.14}s` }}
+            >
+              {ch}
+            </span>
+          ))}
+        </p>
       </motion.div>
 
       <motion.div
@@ -238,10 +287,19 @@ export function HomeFeedSection({ onToast }) {
               posts={byBoard[board.id] ?? []}
               onToast={onToast}
               rollMs={rollIntervals[i] ?? 5000}
+              onCompose={requestCompose}
             />
           </motion.div>
         ))}
       </motion.div>
+
+      <FeedPublishSheet
+        open={Boolean(publish)}
+        boardLabel={publish?.boardLabel}
+        mediaType={publish?.mediaType}
+        onClose={() => setPublish(null)}
+        onSubmit={submitPublish}
+      />
     </section>
   )
 }

@@ -1,6 +1,5 @@
-import { Phone } from 'lucide-react'
 import { useState } from 'react'
-import { FOOTER_FILINGS, FOOTER_LINKS, HAPPINESS_HOTLINE } from '../../data/siteFooter'
+import { FOOTER_FILINGS, FOOTER_LINKS } from '../../data/siteFooter'
 import { SheetModal } from '../me/SheetModal'
 
 export function HomeSiteFooter() {
@@ -10,18 +9,8 @@ export function HomeSiteFooter() {
   return (
     <>
       <footer className="border-t border-white/40 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-5">
-        <a
-          href={`tel:${HAPPINESS_HOTLINE.tel}`}
-          className="flex items-center justify-center gap-1.5 text-[13px] font-medium text-momo-text"
-        >
-          <Phone className="h-3.5 w-3.5 text-momo" strokeWidth={2} />
-          <span>
-            {HAPPINESS_HOTLINE.label}：
-            <span className="text-momo-dark">{HAPPINESS_HOTLINE.display}</span>
-          </span>
-        </a>
         <nav
-          className="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px]"
+          className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px]"
           aria-label="平台信息"
         >
           {FOOTER_LINKS.map((link, i) => (

@@ -4,7 +4,7 @@ import { resolveDemoAvatar } from './demoAvatars'
  * 首页推荐下方 · 客人信息流（多板块）
  * 板块：日常精选 / 讨论话题 / 群主交流 等，后续可接接口或 localStorage
  */
-export const FEED_STORAGE_KEY = 'findmatch-home-feed-v1'
+export const FEED_STORAGE_KEY = 'findmatch-home-feed-v2'
 
 export const HOME_FEED_BOARDS = [
   {
@@ -146,16 +146,57 @@ function enrichPost(p, idx) {
 }
 
 function enrichFeed(posts) {
-  return posts.map(enrichPost)
+  return posts.map((p, idx) => enrichPost(p, idx))
+}
+
+export function loadHomeFeedRaw() {
+  try {
+    const legacy = localStorage.getItem('findmatch-home-feed-v1')
+    const raw = localStorage.getItem(FEED_STORAGE_KEY) ?? legacy
+    if (!raw) return [...DEFAULT_HOME_FEED]
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) && parsed.length ? parsed : [...DEFAULT_HOME_FEED]
+  } catch {
+    return [...DEFAULT_HOME_FEED]
+  }
 }
 
 export function loadHomeFeed() {
+  return enrichFeed(loadHomeFeedRaw())
+}
+
+export function addHomeFeedPost(entry) {
+  const list = loadHomeFeedRaw()
+  const post = {
+    stats: { like: 0, comment: 0 },
+    createdAt: Date.now(),
+    mediaType: 'text',
+    ...entry,
+    id: entry.id ?? `u-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  }
+  const next = [post, ...list]
   try {
-    const raw = localStorage.getItem(FEED_STORAGE_KEY)
-    if (!raw) return enrichFeed(DEFAULT_HOME_FEED)
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) && parsed.length ? enrichFeed(parsed) : enrichFeed(DEFAULT_HOME_FEED)
+    localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(next))
   } catch {
-    return enrichFeed(DEFAULT_HOME_FEED)
+    return null
+  }
+  return enrichPost(post, 0)
+}
+
+export function createUserFeedPost({ board, user, mediaType, content, mediaUrl, mediaPoster, voiceSec }) {
+  const typeTag = { image: '图片动态', video: '视频动态', voice: '语音动态' }[mediaType]
+  return {
+    board,
+    author: user.nickname ?? '我',
+    authorBadge: user.realNameVerified ? '实名' : null,
+    accent: user.avatarAccent ?? '#3EB575',
+    avatarImage: user.avatarImage ?? null,
+    gender: user.gender,
+    content: content?.trim() ?? '',
+    mediaType: mediaType ?? 'text',
+    mediaUrl: mediaUrl ?? null,
+    mediaPoster: mediaPoster ?? null,
+    voiceSec: voiceSec ?? null,
+    topicTag: typeTag ?? null,
   }
 }

@@ -1,14 +1,21 @@
 import { motion } from 'framer-motion'
-import { Droplets, Lock, MapPin, Star } from 'lucide-react'
+import { Cherry, Lock, MapPin, MessageCircle, Phone, Star, Video } from 'lucide-react'
 import { MomoAvatar } from '../MomoAvatar'
 
-export function MatchmakerDropletCard({ matchmaker, locked, index, onBook }) {
+export function MatchmakerDropletCard({
+  matchmaker,
+  locked,
+  index,
+  onMessage,
+  onVideo,
+  onVoice,
+}) {
   const [a, b] = matchmaker.accent ?? ['#F472B6', '#FB7185']
   const delay = index * 0.08
 
   return (
     <motion.article
-      className="matchmaker-droplet-card relative mb-4 overflow-hidden"
+      className="matchmaker-droplet-card matchmaker-sakura-card relative mb-4 overflow-hidden"
       initial={{ opacity: 0, y: 24, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.45, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -44,8 +51,8 @@ export function MatchmakerDropletCard({ matchmaker, locked, index, onBook }) {
                 imageUrl={matchmaker.avatarImage}
               />
             </div>
-            <Droplets
-              className="matchmaker-droplet-icon absolute -bottom-1 -right-1 z-[3] text-sky-400"
+            <Cherry
+              className="matchmaker-droplet-icon absolute -bottom-1 -right-1 z-[3] text-pink-500"
               strokeWidth={2}
             />
           </div>
@@ -92,28 +99,49 @@ export function MatchmakerDropletCard({ matchmaker, locked, index, onBook }) {
           ))}
         </div>
 
-        <div className="mt-3 flex items-center justify-between gap-2">
-          <span className="text-[10px] text-momo-sub">成功案例 {matchmaker.cases ?? '—'}</span>
-          <button
-            type="button"
-            onClick={() => onBook?.(matchmaker)}
-            className={`matchmaker-droplet-cta flex items-center justify-center gap-1 rounded-full px-4 py-2 text-sm font-medium ${
-              locked
-                ? 'border border-white/55 bg-white/25 text-momo-sub'
-                : 'text-white shadow-lg'
-            }`}
-            style={
-              locked
-                ? undefined
-                : {
-                    background: `linear-gradient(135deg, ${a}, ${b})`,
-                    boxShadow: `0 8px 24px ${a}55`,
-                  }
-            }
-          >
-            {locked && <Lock className="h-3.5 w-3.5" />}
-            {locked ? '升级后预约' : '请她牵线'}
-          </button>
+        <div className="mt-3 flex items-end justify-between gap-2">
+          <span className="text-[10px] text-rose-900/65">成功案例 {matchmaker.cases ?? '—'}</span>
+          <div className="flex flex-wrap justify-end gap-1.5">
+            <button
+              type="button"
+              onClick={() => onMessage?.(matchmaker)}
+              className={`matchmaker-sakura-cta flex items-center justify-center gap-1 rounded-full px-3 py-2 text-[11px] font-medium ${
+                locked ? 'matchmaker-sakura-cta-muted' : 'matchmaker-sakura-cta-ghost'
+              }`}
+            >
+              {locked && <Lock className="h-3 w-3" />}
+              <MessageCircle className="h-3.5 w-3.5" />
+              私信
+            </button>
+            <button
+              type="button"
+              onClick={() => onVoice?.(matchmaker)}
+              disabled={locked}
+              className="matchmaker-sakura-cta matchmaker-sakura-cta-ghost flex items-center justify-center gap-1 rounded-full px-3 py-2 text-[11px] font-medium disabled:opacity-45"
+            >
+              <Phone className="h-3.5 w-3.5" />
+              语音
+            </button>
+            <button
+              type="button"
+              onClick={() => onVideo?.(matchmaker)}
+              disabled={locked}
+              className={`matchmaker-sakura-cta flex items-center justify-center gap-1 rounded-full px-3 py-2 text-[11px] font-medium text-white disabled:opacity-45 ${
+                locked ? 'matchmaker-sakura-cta-muted' : ''
+              }`}
+              style={
+                locked
+                  ? undefined
+                  : {
+                      background: `linear-gradient(135deg, ${a}, ${b})`,
+                      boxShadow: `0 8px 22px ${a}44`,
+                    }
+              }
+            >
+              <Video className="h-3.5 w-3.5" />
+              视频
+            </button>
+          </div>
         </div>
       </div>
     </motion.article>

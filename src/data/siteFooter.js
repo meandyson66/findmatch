@@ -1,10 +1,4 @@
-/** 首页底部 · 幸福热线与平台链接（纯前端演示文案） */
-export const HAPPINESS_HOTLINE = {
-  label: '幸福热线',
-  display: '400-888-5200',
-  tel: '4008885200',
-}
-
+/** 首页底部 · 平台链接（纯前端演示文案） */
 export const FOOTER_FILINGS = {
   copyright: '版权所有 © 2025 寻伴网络科技有限公司',
   license: '增值电信业务经营许可证：京B2-20251452号（演示）',
@@ -37,13 +31,13 @@ export const FOOTER_LINKS = [
   },
   {
     id: 'notice',
-    label: '平台公告',
-    title: '平台公告',
+    label: '加入我们',
+    title: '加入我们',
     body: [
-      '【文明交友】请勿私下转账，线下见面选择公共场所。',
-      '【实名发言】未实名用户暂不可发起聊天与评论。',
-      '【下载更新】GitHub 搜索 findmatch 或打开 github.com/meandyson66/findmatch → Releases 下载安卓 APK。',
-      '【版本动态】应用内「我的 → 检查更新」可检测新版本。',
+      '欢迎同城伙伴、红娘顾问与社区志愿者加入寻伴共建。',
+      '合作与入驻：service@findmatch.demo（演示邮箱）',
+      '请在「我的 → 帮助与反馈」留言「加入寻伴」+ 城市 + 意向角色。',
+      '开源共建：GitHub 搜索 findmatch → github.com/meandyson66/findmatch',
     ],
   },
   {

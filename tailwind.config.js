@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        momo: '#3EB575',
-        'momo-dark': '#2DA065',
-        'momo-bg': '#F3F3F5',
-        'momo-card': '#FFFFFF',
-        'momo-text': '#1A1A1A',
-        'momo-sub': '#8E8E93',
-        'momo-line': '#E8E8ED',
+        momo: '#3DEE9F',
+        'momo-dark': '#2DD4BF',
+        'momo-bg': '#14121F',
+        'momo-card': '#252238',
+        'momo-text': '#F1F5F9',
+        'momo-sub': '#94A3B8',
+        'momo-line': 'rgba(255,255,255,0.14)',
         obsidian: '#0F0D15',
-        neon: '#A855F7',
-        mint: '#34D399',
+        neon: '#C084FC',
+        mint: '#2DD4BF',
       },
       fontFamily: {
         sans: [
