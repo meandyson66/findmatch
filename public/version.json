@@ -1,9 +1,9 @@
 {
-  "versionName": "0.1.18",
-  "versionCode": 19,
-  "releaseNotes": "修复手机与网页无法拖拽水滴：拖动逻辑接入底栏、window 级跟随、pointer-events 修复。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.18/app-release.apk",
+  "versionName": "0.1.19",
+  "versionCode": 20,
+  "releaseNotes": "会员区：前 5 位保留流光彩边与发光昵称，其余头像改为灰色普通样式。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.19/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json",
-  "checkedAt": 1795023918398
+  "checkedAt": 1795025123771
 }

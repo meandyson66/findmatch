@@ -236,12 +236,17 @@ function seededShuffle(list, seed) {
 
 const ALL_VIP_MEMBER_SRC = [...VIP_FEATURED_FIXED, ...VIP_MEMBER_POOL]
 
+const VIP_MEMBER_PLAIN_ACCENT = '#94A3B8'
+
 function enrichMember(m) {
   const tier = getVipTier(m.vipLevel)
   const n = Number.parseInt(m.id.replace(/\D/g, ''), 10) || 1
+  const featured = Boolean(m.fixed)
+  const accent = featured ? (m.accent ?? '#3EB575') : VIP_MEMBER_PLAIN_ACCENT
   return {
     ...m,
     tier,
+    accent,
     /** 运营/后台统计用，禁止在 C 端展示 */
     vipInvest: m.vipInvest ?? tier.minRecharge + (n % 4) * 22,
     education: m.education ?? (['本科', '硕士', '大专'])[n % 3],
@@ -265,7 +270,7 @@ export function findVipMemberById(id) {
 export function findVipMemberProfile(id) {
   const m = findVipMemberById(id)
   if (!m) return null
-  const row = enrichMember(m)
+  const row = enrichMember({ ...m, fixed: isVipFeaturedFixedId(id) })
   return {
     id: row.linkUserId ?? row.id,
     nickname: row.nickname,
