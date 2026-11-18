@@ -11,16 +11,22 @@ export function BottomNav() {
   const { state, patch } = useApp()
   const reduceMotion = useReducedMotion()
   const [tabSwitchSeq, setTabSwitchSeq] = useState(0)
+  const [dragPreviewId, setDragPreviewId] = useState(null)
 
   useEffect(() => {
     setTabSwitchSeq((n) => n + 1)
+  }, [state.tab])
+
+  useEffect(() => {
+    setDragPreviewId(null)
   }, [state.tab])
 
   const unread = useMemo(() => {
     return Object.values(state.chats).filter((c) => (c.unread ?? 0) > 0).length
   }, [state.chats])
 
-  const activeAccent = TAB_ACCENT[state.tab] ?? TAB_ACCENT.home
+  const visualTab = dragPreviewId ?? state.tab
+  const activeAccent = TAB_ACCENT[visualTab] ?? TAB_ACCENT.home
   const dockRowRef = useRef(null)
   const dockItemRefs = useRef([])
 
@@ -53,16 +59,10 @@ export function BottomNav() {
 
         <ul
           ref={dockRowRef}
-          className="relative z-[3] flex items-stretch justify-between px-1 py-1.5"
+          className="relative z-[3] flex items-stretch justify-between px-1 py-1"
         >
-          <TabDockDragPill
-            rowRef={dockRowRef}
-            itemRefs={dockItemRefs}
-            activeId={state.tab}
-            onSelect={(id) => patch({ tab: id })}
-          />
           {TABS.map(({ id, label }, index) => {
-            const active = state.tab === id
+            const active = visualTab === id
             const accent = TAB_ACCENT[id]
 
             return (
@@ -71,22 +71,25 @@ export function BottomNav() {
                 ref={(el) => {
                   dockItemRefs.current[index] = el
                 }}
-                className="relative z-[3] min-w-0 flex-1"
+                className="tab-dock-cell relative z-[5] min-w-0 flex-1"
               >
                 <motion.button
                   type="button"
                   onClick={() => patch({ tab: id })}
-                  className="relative flex w-full flex-col items-center gap-0.5 py-1 pointer-events-none"
+                  className="relative flex w-full flex-col items-center gap-0 py-0.5 leading-none"
                   whileTap={reduceMotion ? undefined : { scale: 0.9, y: 1 }}
                   whileHover={reduceMotion ? undefined : { y: -2 }}
                   style={{ transformStyle: 'preserve-3d' }}
                 >
-                  <span className="tab-dock-icon-stage pointer-events-auto relative flex h-9 w-9 items-center justify-center">
+                  <motion.span
+                    className="tab-dock-icon-stage pointer-events-auto relative z-20 flex h-8 w-8 items-center justify-center"
+                    whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+                  >
                     {active && !reduceMotion && (
                       <>
                         <motion.span
                           key={`burst-${id}-${tabSwitchSeq}`}
-                          className="absolute inset-0 rounded-full border border-white/60"
+                          className="absolute inset-0 z-0 rounded-full border border-white/60"
                           style={{
                             background: `radial-gradient(circle, rgba(${accent.glow},0.35), transparent 72%)`,
                           }}
@@ -96,7 +99,7 @@ export function BottomNav() {
                           aria-hidden
                         />
                         <motion.span
-                          className="absolute inset-0 rounded-full blur-md"
+                          className="absolute inset-0 z-0 rounded-full blur-md"
                           style={{
                             background: `linear-gradient(135deg, ${accent.a}, ${accent.b})`,
                           }}
@@ -120,7 +123,7 @@ export function BottomNav() {
                     </span>
                     {id === 'messages' && unread > 0 && (
                       <motion.span
-                        className="absolute -right-0.5 -top-0.5 z-20 flex h-3.5 min-w-3.5 items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-rose-500 to-orange-400 px-0.5 text-[8px] font-bold text-white shadow-lg"
+                        className="absolute -right-0.5 -top-0.5 z-30 flex h-3.5 min-w-3.5 items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-rose-500 to-orange-400 px-0.5 text-[8px] font-bold text-white shadow-lg"
                         initial={{ scale: 0 }}
                         animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.12, 1] }}
                         transition={{
@@ -130,11 +133,11 @@ export function BottomNav() {
                         {unread > 9 ? '9+' : unread}
                       </motion.span>
                     )}
-                  </span>
+                  </motion.span>
 
                   <motion.span
                     key={active ? `${id}-label-${tabSwitchSeq}` : `${id}-label`}
-                    className="pointer-events-none relative z-10 max-w-full truncate px-0.5 text-[10px]"
+                    className="pointer-events-none relative z-20 -mt-px max-w-full truncate px-0.5 text-[10px] leading-tight"
                     initial={active && !reduceMotion ? { opacity: 0.45, y: 5, scale: 0.92 } : false}
                     animate={
                       reduceMotion
@@ -154,7 +157,7 @@ export function BottomNav() {
                       WebkitBackgroundClip: active ? 'text' : undefined,
                       WebkitTextFillColor: active ? 'transparent' : undefined,
                       color: active ? undefined : '#94A3B8',
-                      textShadow: active ? undefined : '0 1px 0 rgba(255,255,255,0.65)',
+                      textShadow: active ? undefined : '0 1px 0 rgba(255, 255, 255, 0.65)',
                     }}
                   >
                     {label}
@@ -163,6 +166,14 @@ export function BottomNav() {
               </li>
             )
           })}
+          <TabDockDragPill
+            rowRef={dockRowRef}
+            itemRefs={dockItemRefs}
+            visualId={visualTab}
+            committedId={state.tab}
+            onSelect={(id) => patch({ tab: id })}
+            onDragPreview={setDragPreviewId}
+          />
         </ul>
       </nav>
     </div>
