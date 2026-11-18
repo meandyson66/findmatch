@@ -1,24 +1,14 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useHorizontalTabSwipe } from '../../hooks/useHorizontalTabSwipe'
-import { MAIN_TAB_IDS, shiftTabId, tabIndex } from './tabConfig'
+import { useEffect, useRef, useState } from 'react'
+import { tabIndex } from './tabConfig'
 
 const spring = { type: 'spring', stiffness: 420, damping: 38, mass: 0.92 }
 
-export function MainTabPager({ tab, onTabChange, enabled, children }) {
+export function MainTabPager({ tab, children }) {
   const reduceMotion = useReducedMotion()
   const [direction, setDirection] = useState(0)
   const prevTab = useRef(tab)
   const mounted = useRef(false)
-
-  const goTab = useCallback(
-    (next, dir) => {
-      if (!MAIN_TAB_IDS.includes(next) || next === tab) return
-      setDirection(dir ?? (tabIndex(next) > tabIndex(tab) ? 1 : -1))
-      onTabChange(next)
-    },
-    [onTabChange, tab]
-  )
 
   useEffect(() => {
     if (!mounted.current) {
@@ -32,19 +22,6 @@ export function MainTabPager({ tab, onTabChange, enabled, children }) {
       prevTab.current = tab
     }
   }, [tab])
-
-  const swipeRef = useHorizontalTabSwipe(
-    enabled,
-    () => {
-      const next = shiftTabId(tab, 1)
-      if (next) goTab(next, 1)
-    },
-    () => {
-      const prev = shiftTabId(tab, -1)
-      if (prev) goTab(prev, -1)
-    },
-    { threshold: 52 }
-  )
 
   const variants = {
     enter: (d) => ({
@@ -65,7 +42,7 @@ export function MainTabPager({ tab, onTabChange, enabled, children }) {
   }
 
   return (
-    <div ref={swipeRef} className="tab-pager-root relative min-h-0 flex-1 overflow-hidden">
+    <div className="tab-pager-root relative min-h-0 flex-1 overflow-hidden">
       <AnimatePresence mode="wait" custom={direction} initial={false}>
         <motion.div
           key={tab}

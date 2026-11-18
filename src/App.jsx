@@ -48,11 +48,7 @@ export default function App() {
             onDismiss={dismiss}
           />
         )}
-        <MainTabPager
-          tab={state.tab}
-          onTabChange={(id) => patch({ tab: id })}
-          enabled={!chatId}
-        >
+        <MainTabPager tab={state.tab}>
           {state.tab === 'home' && <HomePage onOpenChat={openChat} />}
           {state.tab === 'vip' && <VipPage onOpenChat={openChat} />}
           {state.tab === 'matchmaker' && <MatchmakerPage onOpenChat={openChat} />}

@@ -1,9 +1,9 @@
 {
-  "versionName": "0.1.13",
-  "versionCode": 14,
-  "releaseNotes": "前 5 位固定会员昵称发光闪烁；修复安卓检查更新误读本地 version 导致总提示已是最新（改为拉 GitHub Pages / 主分支并移除包内 version.json）。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.13/app-release.apk",
+  "versionName": "0.1.14",
+  "versionCode": 15,
+  "releaseNotes": "底栏玻璃选中框可左右拖动切换 Tab；取消整屏/胶囊横滑，避免误触系统手势。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.14/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json",
-  "checkedAt": 1795019629237
+  "checkedAt": 1795020300407
 }

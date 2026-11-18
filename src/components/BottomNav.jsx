@@ -1,8 +1,8 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useApp } from '../context/AppContext'
-import { useHorizontalTabSwipe } from '../hooks/useHorizontalTabSwipe'
-import { TAB_ACCENT, TABS, shiftTabId } from './nav/tabConfig'
+import { TAB_ACCENT, TABS } from './nav/tabConfig'
+import { TabDockDragPill } from './nav/TabDockDragPill'
 import { TabDockIcon } from './nav/TabDockIcon'
 
 const spring = { type: 'spring', stiffness: 520, damping: 34, mass: 0.85 }
@@ -21,27 +21,14 @@ export function BottomNav() {
   }, [state.chats])
 
   const activeAccent = TAB_ACCENT[state.tab] ?? TAB_ACCENT.home
-
-  const shiftTab = useCallback(
-    (delta) => {
-      const next = shiftTabId(state.tab, delta)
-      if (next) patch({ tab: next })
-    },
-    [patch, state.tab]
-  )
-
-  const dockSwipeRef = useHorizontalTabSwipe(
-    true,
-    () => shiftTab(1),
-    () => shiftTab(-1),
-    { threshold: 40, ratio: 1.1 }
-  )
+  const dockRowRef = useRef(null)
+  const dockItemRefs = useRef([])
 
   return (
-    <div ref={dockSwipeRef} className="tab-liquid-dock-wrap">
+    <div className="tab-liquid-dock-wrap">
       <nav
         className="tab-liquid-dock tab-nav-aurora"
-        aria-label="主导航"
+        aria-label="主导航：点击图标切换，或按住玻璃高亮左右拖动"
         style={{ perspective: reduceMotion ? undefined : 900 }}
       >
         {!reduceMotion && (
@@ -64,33 +51,37 @@ export function BottomNav() {
           </>
         )}
 
-        <ul className="relative z-[3] flex items-stretch justify-between px-1 py-1.5">
-          {TABS.map(({ id, label }) => {
+        <ul
+          ref={dockRowRef}
+          className="relative z-[3] flex items-stretch justify-between px-1 py-1.5"
+        >
+          <TabDockDragPill
+            rowRef={dockRowRef}
+            itemRefs={dockItemRefs}
+            activeId={state.tab}
+            onSelect={(id) => patch({ tab: id })}
+          />
+          {TABS.map(({ id, label }, index) => {
             const active = state.tab === id
             const accent = TAB_ACCENT[id]
 
             return (
-              <li key={id} className="min-w-0 flex-1">
+              <li
+                key={id}
+                ref={(el) => {
+                  dockItemRefs.current[index] = el
+                }}
+                className="relative z-[3] min-w-0 flex-1"
+              >
                 <motion.button
                   type="button"
                   onClick={() => patch({ tab: id })}
-                  className="relative flex w-full flex-col items-center gap-0.5 py-1"
+                  className="relative flex w-full flex-col items-center gap-0.5 py-1 pointer-events-none"
                   whileTap={reduceMotion ? undefined : { scale: 0.9, y: 1 }}
                   whileHover={reduceMotion ? undefined : { y: -2 }}
                   style={{ transformStyle: 'preserve-3d' }}
                 >
-                  {active && (
-                    <motion.span
-                      layoutId="tab-active-pill"
-                      className="tab-dock-pill absolute inset-x-0.5 bottom-0 top-0"
-                      style={{
-                        boxShadow: `0 12px 28px rgba(${accent.glow},0.22), inset 0 2px 0 rgba(255,255,255,0.92), inset 0 -8px 16px rgba(255,255,255,0.4)`,
-                      }}
-                      transition={spring}
-                    />
-                  )}
-
-                  <span className="tab-dock-icon-stage relative flex h-9 w-9 items-center justify-center">
+                  <span className="tab-dock-icon-stage pointer-events-auto relative flex h-9 w-9 items-center justify-center">
                     {active && !reduceMotion && (
                       <>
                         <motion.span
@@ -143,7 +134,7 @@ export function BottomNav() {
 
                   <motion.span
                     key={active ? `${id}-label-${tabSwitchSeq}` : `${id}-label`}
-                    className="relative z-10 max-w-full truncate px-0.5 text-[10px]"
+                    className="pointer-events-none relative z-10 max-w-full truncate px-0.5 text-[10px]"
                     initial={active && !reduceMotion ? { opacity: 0.45, y: 5, scale: 0.92 } : false}
                     animate={
                       reduceMotion
