@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.17",
-  "versionCode": 18,
-  "releaseNotes": "修复点水滴无法拖动（坐标命中 + Touch）；水滴更软、弹性幅度加大；底栏拖动与 Tab 切换优化。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.17/app-release.apk",
+  "versionName": "0.1.18",
+  "versionCode": 19,
+  "releaseNotes": "修复手机与网页无法拖拽水滴：拖动逻辑接入底栏、window 级跟随、pointer-events 修复。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.18/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

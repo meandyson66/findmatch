@@ -218,10 +218,6 @@ body {
   }
 
   .tab-dock-cell {
-    pointer-events: none;
-  }
-
-  .tab-dock-cell .pointer-events-auto {
     pointer-events: auto;
   }
 
@@ -234,7 +230,6 @@ body {
     transform-origin: center center;
     background: transparent !important;
     box-shadow: none !important;
-    pointer-events: none;
   }
 
   .tab-dock-cell--active-dock {
@@ -246,6 +241,7 @@ body {
   }
 
   .tab-dock-pill-draggable {
+    pointer-events: auto;
     touch-action: none;
     cursor: grab;
     transform-origin: center center;
