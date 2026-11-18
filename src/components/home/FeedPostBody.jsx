@@ -50,9 +50,10 @@ function FeedVoiceChip({ durationSec = 3, accent = '#3EB575' }) {
   )
 }
 
-export function FeedPostBody({ post, compact }) {
+export function FeedPostBody({ post, compact, expanded }) {
   const type = post.mediaType ?? 'text'
-  const lineClamp = compact ? 'line-clamp-2' : 'line-clamp-3'
+  const lineClamp = expanded ? '' : compact ? 'line-clamp-2' : 'line-clamp-3'
+  const mediaH = expanded ? 'max-h-44' : 'max-h-28'
 
   return (
     <>
@@ -60,7 +61,7 @@ export function FeedPostBody({ post, compact }) {
         <img
           src={post.mediaUrl}
           alt=""
-          className="mt-2 max-h-28 w-full rounded-lg border border-white/35 object-cover"
+          className={`mt-2 w-full rounded-lg border border-white/35 object-cover ${mediaH}`}
         />
       )}
       {type === 'video' && (
@@ -69,7 +70,7 @@ export function FeedPostBody({ post, compact }) {
             <video
               src={post.mediaUrl}
               poster={post.mediaPoster ?? undefined}
-              className="max-h-28 w-full object-cover"
+              className={`w-full object-cover ${mediaH}`}
               controls
               playsInline
               preload="metadata"
@@ -84,7 +85,11 @@ export function FeedPostBody({ post, compact }) {
         <FeedVoiceChip durationSec={post.voiceSec ?? 3} accent={post.accent} />
       )}
       {(type === 'text' || post.content) && (
-        <p className={`mt-1 ${lineClamp} text-[13px] leading-snug text-white/95`}>{post.content}</p>
+        <p
+          className={`mt-1 ${lineClamp} text-[13px] leading-relaxed text-white/95 ${expanded ? 'whitespace-pre-wrap' : ''}`}
+        >
+          {post.content}
+        </p>
       )}
     </>
   )

@@ -32,6 +32,22 @@ export const DEMO_SCENES = {
   coffee: pexelsWide(302899),
 }
 
+/** 交流广场配图 / 视频封面（横图） */
+export const DEMO_FEED_PHOTOS = [
+  302899, 2673250, 4491282, 1755384, 31470808, 2682459, 1266831, 3311847, 34950,
+  7994390, 3225528, 1838522, 3608544, 1252869, 1179225, 1323550, 1282278, 3402625,
+]
+
+export function pexelsFeedWide(photoId) {
+  return pexelsWide(photoId)
+}
+
+/** 演示用短视频（需联网） */
+export const DEMO_FEED_VIDEO = {
+  url: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
+  posterPhotoId: 3311847,
+}
+
 function pexelsWide(photoId) {
   return (
     `https://images.pexels.com/photos/${photoId}/pexels-photo-${photoId}.jpeg` +

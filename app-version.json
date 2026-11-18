@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.19",
-  "versionCode": 20,
-  "releaseNotes": "会员区：前 5 位保留流光彩边与发光昵称，其余头像改为灰色普通样式。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.19/app-release.apk",
+  "versionName": "0.1.20",
+  "versionCode": 21,
+  "releaseNotes": "交流广场：四板块纵向列表、每页15条可翻页、每板22条演示数据；模板分界光效与标题焕彩；移除底部引导文案。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.20/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

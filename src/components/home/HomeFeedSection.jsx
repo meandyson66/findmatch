@@ -1,9 +1,19 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, Heart, MessageCircle, Sparkles } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  ChevronLeft,
+  ChevronRight,
+  Flame,
+  Heart,
+  HeartHandshake,
+  MessageCircle,
+  Sparkles,
+  Users,
+} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { MomoAvatar } from '../MomoAvatar'
 import {
   HOME_FEED_BOARDS,
+  HOME_FEED_PAGE_SIZE,
   addHomeFeedPost,
   createUserFeedPost,
   loadHomeFeed,
@@ -14,44 +24,168 @@ import { formatRelative } from '../../utils/formatTime'
 import { FeedPostBody } from './FeedPostBody'
 import { FEED_PUBLISH_TYPES, FeedPublishSheet } from './FeedPublishSheet'
 
+const BOARD_VISUAL = {
+  featured: { icon: Sparkles, tone: '精选' },
+  topic: { icon: Flame, tone: '热议' },
+  group: { icon: Users, tone: '圈子' },
+  match: { icon: HeartHandshake, tone: '牵线' },
+}
+
+function FeedPlazaBoundary({ board }) {
+  const Icon = BOARD_VISUAL[board.id]?.icon ?? Sparkles
+  const [a, b] = board.frame ?? ['#3EB575', '#5B8FB9']
+  return (
+    <div
+      className={`feed-plaza-boundary feed-plaza-boundary--${board.id}`}
+      role="separator"
+      aria-label={board.label}
+      style={{ '--feed-board-a': a, '--feed-board-b': b }}
+    >
+      <span className="feed-plaza-boundary-beam" aria-hidden />
+      <motion.div
+        className="feed-plaza-boundary-core"
+        initial={{ scale: 0.82, opacity: 0.6 }}
+        whileInView={{ scale: 1, opacity: 1 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ type: 'spring', stiffness: 380, damping: 18 }}
+      >
+        <span className="feed-plaza-boundary-ring feed-plaza-boundary-ring-a" aria-hidden />
+        <span className="feed-plaza-boundary-ring feed-plaza-boundary-ring-b" aria-hidden />
+        <span className="feed-plaza-boundary-icon">
+          <Icon className="h-5 w-5" aria-hidden />
+        </span>
+      </motion.div>
+      <span className="feed-plaza-boundary-beam" aria-hidden />
+    </div>
+  )
+}
+
 function slideBg(post, board) {
   const [a, b] = board?.frame ?? ['#3EB575', '#5B8FB9']
   const accent = post.accent ?? a
   return `linear-gradient(135deg, ${accent}55 0%, ${a}44 40%, ${b}38 100%)`
 }
 
-function FeedLiquidWindow({ board, posts, onToast, rollMs, onCompose }) {
-  const [index, setIndex] = useState(0)
-  const post = posts[index] ?? posts[0]
-  const [a, b] = board.frame ?? ['#3EB575', '#5B8FB9']
-  const captionTrack = useMemo(() => [...posts, ...posts], [posts])
-
-  const go = useCallback(
-    (delta) => {
-      if (posts.length < 2) return
-      setIndex((i) => (i + delta + posts.length) % posts.length)
-    },
-    [posts.length]
+function FeedPlazaPost({ post, board, onToast, displayIndex }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onToast?.('动态详情页预留，后续可接评论与私信')}
+      className="feed-plaza-post relative block w-full overflow-hidden px-3 py-3 text-left"
+      style={{ background: slideBg(post, board) }}
+    >
+      <span className="feed-plaza-post-index" aria-hidden>
+        {String(displayIndex).padStart(2, '0')}
+      </span>
+      <div className="promo-slide-glass absolute inset-0" aria-hidden />
+      <div className="relative z-[1] flex gap-3">
+        <MomoAvatar
+          nickname={post.author}
+          accent={post.accent}
+          size={42}
+          imageUrl={post.avatarImage}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+            <p className="text-sm font-semibold text-white drop-shadow">{post.author}</p>
+            {post.authorBadge && (
+              <span className="text-[10px] font-medium text-white/90">· {post.authorBadge}</span>
+            )}
+            <span className="text-[10px] text-white/75">· {formatRelative(post.createdAt)}</span>
+          </div>
+          {post.topicTag && (
+            <p className="mt-0.5 text-[10px] font-medium text-white/95">{post.topicTag}</p>
+          )}
+          <FeedPostBody post={post} expanded />
+          <div className="mt-2 flex gap-4 text-[11px] text-white/90">
+            <span className="inline-flex items-center gap-1">
+              <Heart className="h-3.5 w-3.5" />
+              {post.stats?.like ?? 0}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <MessageCircle className="h-3.5 w-3.5" />
+              {post.stats?.comment ?? 0}
+            </span>
+          </div>
+        </div>
+      </div>
+    </button>
   )
+}
+
+function FeedPlazaPager({ page, totalPages, totalCount, onPageChange }) {
+  if (totalPages <= 1) return null
+
+  return (
+    <nav
+      className="feed-plaza-pager relative z-[2]"
+      aria-label="翻页查看更多"
+    >
+      <button
+        type="button"
+        disabled={page <= 0}
+        onClick={() => onPageChange(page - 1)}
+        className="feed-plaza-pager-btn"
+        aria-label="上一页"
+      >
+        <ChevronLeft className="h-4 w-4" />
+        上一页
+      </button>
+      <div className="feed-plaza-pager-meta">
+        <span className="feed-plaza-pager-page">
+          第 {page + 1} / {totalPages} 页
+        </span>
+        <span className="text-momo-sub/80">共 {totalCount} 条</span>
+      </div>
+      <button
+        type="button"
+        disabled={page >= totalPages - 1}
+        onClick={() => onPageChange(page + 1)}
+        className="feed-plaza-pager-btn"
+        aria-label="下一页"
+      >
+        下一页
+        <ChevronRight className="h-4 w-4" />
+      </button>
+    </nav>
+  )
+}
+
+function FeedLiquidWindow({ board, allPosts, onToast, onCompose }) {
+  const [a, b] = board.frame ?? ['#3EB575', '#5B8FB9']
+  const visual = BOARD_VISUAL[board.id] ?? BOARD_VISUAL.featured
+  const Icon = visual.icon
+  const totalCount = allPosts.length
+  const totalPages = Math.max(1, Math.ceil(totalCount / HOME_FEED_PAGE_SIZE))
+  const [page, setPage] = useState(0)
 
   useEffect(() => {
-    if (posts.length < 2) return undefined
-    const t = setInterval(() => go(1), rollMs)
-    return () => clearInterval(t)
-  }, [posts.length, go, rollMs])
+    setPage(0)
+  }, [board.id, totalCount])
 
   useEffect(() => {
-    setIndex(0)
-  }, [posts[0]?.id])
+    if (page > totalPages - 1) setPage(Math.max(0, totalPages - 1))
+  }, [page, totalPages])
 
-  if (!post) {
+  const pageStart = page * HOME_FEED_PAGE_SIZE
+  const posts = allPosts.slice(pageStart, pageStart + HOME_FEED_PAGE_SIZE)
+
+  if (!totalCount) {
     return (
-      <div className="promo-liquid-shell px-3 py-8 text-center text-xs text-momo-sub">暂无内容</div>
+      <div
+        className={`promo-liquid-shell feed-plaza-board feed-plaza-board--${board.id} px-3 py-8 text-center text-xs text-momo-sub`}
+        style={{ '--feed-board-a': a, '--feed-board-b': b }}
+      >
+        暂无内容
+      </div>
     )
   }
 
   return (
-    <article className="promo-liquid-shell relative overflow-hidden">
+    <article
+      className={`promo-liquid-shell feed-plaza-board feed-plaza-board--${board.id} relative overflow-hidden`}
+      style={{ '--feed-board-a': a, '--feed-board-b': b }}
+    >
       <span
         className="promo-liquid-orb promo-liquid-orb-a pointer-events-none"
         style={{ background: `radial-gradient(circle, ${a}66, transparent 70%)` }}
@@ -69,10 +203,27 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs, onCompose }) {
         aria-hidden
       />
 
-      <div className="relative z-[2] border-b border-white/35 px-3 py-2">
-        <p className="text-[13px] font-semibold text-momo-text">{board.label}</p>
-        <p className="text-[10px] text-momo-sub">{board.desc}</p>
-      </div>
+      <header className="feed-plaza-board-hero relative z-[2]">
+        <div className="feed-plaza-board-hero-bar" aria-hidden />
+        <div className="relative flex items-start gap-3 px-3 py-3">
+          <div className="feed-plaza-board-icon" aria-hidden>
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className={`feed-plaza-board-eyebrow feed-plaza-board-eyebrow--${board.id}`}>
+              {visual.tone}
+            </p>
+            <h3 className={`feed-plaza-board-title feed-plaza-board-title--${board.id}`}>
+              {board.label}
+            </h3>
+            <p className="mt-0.5 text-[11px] text-white/85">{board.desc}</p>
+          </div>
+          <span className="feed-plaza-board-count shrink-0">
+            {totalPages > 1 ? `第${page + 1}页 · ` : ''}
+            {totalCount} 条
+          </span>
+        </div>
+      </header>
 
       <div className="relative z-[2] flex flex-wrap items-center gap-1 border-b border-white/30 px-2 py-2">
         {FEED_PUBLISH_TYPES.map(({ id, label, icon: Icon }) => (
@@ -88,116 +239,24 @@ function FeedLiquidWindow({ board, posts, onToast, rollMs, onCompose }) {
         ))}
       </div>
 
-      <div className="promo-liquid-stage relative z-[2] overflow-hidden">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.button
+      <div className="feed-plaza-list relative z-[2]">
+        {posts.map((post, i) => (
+          <FeedPlazaPost
             key={post.id}
-            type="button"
-            onClick={() => onToast?.('动态详情页预留，后续可接评论与私信')}
-            className="relative block min-h-[148px] w-full overflow-hidden px-3 py-2.5 text-left"
-            style={{ background: slideBg(post, board) }}
-            initial={{ opacity: 0, x: 24, filter: 'blur(4px)' }}
-            animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, x: -24, filter: 'blur(4px)' }}
-            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="promo-slide-glass absolute inset-0" aria-hidden />
-            <div className="relative z-[1] flex min-h-[108px] flex-col">
-              <div className="flex gap-2.5">
-                <MomoAvatar
-                    nickname={post.author}
-                    accent={post.accent}
-                    size={36}
-                    imageUrl={post.avatarImage}
-                  />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-white drop-shadow">
-                    {post.author}
-                    {post.authorBadge && (
-                      <span className="ml-1 text-[10px] font-medium text-white/90">
-                        · {post.authorBadge}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-[10px] text-white/85">{formatRelative(post.createdAt)}</p>
-                  {post.topicTag && (
-                    <p className="mt-0.5 text-[10px] font-medium text-white/95">{post.topicTag}</p>
-                  )}
-                  <FeedPostBody post={post} compact />
-                </div>
-              </div>
-              <div className="mt-auto flex gap-4 pt-1.5 text-[11px] text-white/90">
-                <span className="inline-flex items-center gap-1">
-                  <Heart className="h-3.5 w-3.5" />
-                  {post.stats?.like ?? 0}
-                </span>
-                <span className="inline-flex items-center gap-1">
-                  <MessageCircle className="h-3.5 w-3.5" />
-                  {post.stats?.comment ?? 0}
-                </span>
-              </div>
-            </div>
-          </motion.button>
-        </AnimatePresence>
-
-        {posts.length > 1 && (
-          <>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                go(-1)
-              }}
-              className="promo-nav-btn absolute left-1.5 top-1/2 z-10 -translate-y-1/2"
-              aria-label="上一条"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation()
-                go(1)
-              }}
-              className="promo-nav-btn absolute right-1.5 top-1/2 z-10 -translate-y-1/2"
-              aria-label="下一条"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-          </>
-        )}
+            post={post}
+            board={board}
+            onToast={onToast}
+            displayIndex={pageStart + i + 1}
+          />
+        ))}
       </div>
 
-      {posts.length > 1 && (
-        <div className="promo-caption-marquee-mask relative z-[2] border-t border-white/30 py-1.5">
-          <div className="promo-marquee-track">
-            {captionTrack.map((p, i) => (
-              <button
-                key={`${p.id}-cap-${i}`}
-                type="button"
-                onClick={() => setIndex(i % posts.length)}
-                className={`promo-caption-chip ${i % posts.length === index ? 'promo-caption-chip-active' : ''}`}
-              >
-                {p.author}：{p.content.length > 16 ? `${p.content.slice(0, 16)}…` : p.content}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {posts.length > 1 && (
-        <div className="relative z-[2] flex justify-center gap-1 pb-2 pt-0.5">
-          {posts.map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => setIndex(i)}
-              className={`promo-dot ${i === index ? 'promo-dot-active' : ''}`}
-              aria-label={`${board.label} 第 ${i + 1} 条`}
-            />
-          ))}
-        </div>
-      )}
+      <FeedPlazaPager
+        page={page}
+        totalPages={totalPages}
+        totalCount={totalCount}
+        onPageChange={setPage}
+      />
     </article>
   )
 }
@@ -240,8 +299,6 @@ export function HomeFeedSection({ onToast }) {
     onToast?.(`已发布到${publish.boardLabel}`)
   }
 
-  const rollIntervals = [4800, 5200, 5600, 5000]
-
   return (
     <section className="px-3 pb-6 pt-1">
       <motion.div
@@ -265,32 +322,36 @@ export function HomeFeedSection({ onToast }) {
       </motion.div>
 
       <motion.div
-        className="flex flex-col gap-3"
+        className="feed-plaza-stack"
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, margin: '-20px' }}
         variants={{
           hidden: {},
-          show: { transition: { staggerChildren: 0.1 } },
+          show: { transition: { staggerChildren: 0.08 } },
         }}
       >
-        {HOME_FEED_BOARDS.map((board, i) => (
-          <motion.div
-            key={board.id}
-            variants={{
-              hidden: { opacity: 0, y: 14 },
-              show: { opacity: 1, y: 0, transition: { duration: 0.32 } },
-            }}
-          >
-            <FeedLiquidWindow
-              board={board}
-              posts={byBoard[board.id] ?? []}
-              onToast={onToast}
-              rollMs={rollIntervals[i] ?? 5000}
-              onCompose={requestCompose}
-            />
-          </motion.div>
-        ))}
+        {HOME_FEED_BOARDS.map((board, sectionIndex) => {
+          const allPosts = byBoard[board.id] ?? []
+          return (
+            <motion.div
+              key={board.id}
+              className="feed-plaza-section"
+              variants={{
+                hidden: { opacity: 0, y: 14 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.32 } },
+              }}
+            >
+              {sectionIndex > 0 && <FeedPlazaBoundary board={board} />}
+              <FeedLiquidWindow
+                board={board}
+                allPosts={allPosts}
+                onToast={onToast}
+                onCompose={requestCompose}
+              />
+            </motion.div>
+          )
+        })}
       </motion.div>
 
       <FeedPublishSheet
