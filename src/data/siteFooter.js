@@ -42,7 +42,8 @@ export const FOOTER_LINKS = [
     body: [
       '【文明交友】请勿私下转账，线下见面选择公共场所。',
       '【实名发言】未实名用户暂不可发起聊天与评论。',
-      '【版本动态】更新说明见「我的 → 检查更新」。',
+      '【下载更新】GitHub 搜索 findmatch 或打开 github.com/meandyson66/findmatch → Releases 下载安卓 APK。',
+      '【版本动态】应用内「我的 → 检查更新」可检测新版本。',
     ],
   },
   {
@@ -50,9 +51,10 @@ export const FOOTER_LINKS = [
     label: '关于我们',
     title: '关于我们',
     body: [
-      '寻伴 — 以真实资料与默契测试连接的交友产品（演示版）。',
-      '技术栈：纯前端 MVP，数据存于本地，仅供体验与演示。',
-      '感谢您使用，祝早日遇见对的人。',
+      '寻伴 FindMatch — 附近交友演示（React + 安卓 WebView）。',
+      '开源仓库：github.com/meandyson66/findmatch（搜索 findmatch / 寻伴 可找到）。',
+      '安卓安装包：仓库 Releases 页 → 最新版 app-release.apk。',
+      '网页体验：meandyson66.github.io/findmatch/',
     ],
   },
 ]

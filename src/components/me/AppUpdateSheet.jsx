@@ -1,6 +1,12 @@
 import { Download, Sparkles, X } from 'lucide-react'
 import { SheetModal } from './SheetModal'
-import { getCurrentVersionLabel, isAndroidApp, openUpdateTarget } from '../../utils/updateCheck'
+import { APP_LINKS } from '../../data/appLinks'
+import {
+  getCurrentVersionLabel,
+  isAndroidApp,
+  openGithubRepo,
+  openUpdateTarget,
+} from '../../utils/updateCheck'
 
 export function AppUpdateSheet({ open, remote, onClose, onDismiss }) {
   if (!remote) return null
@@ -37,10 +43,17 @@ export function AppUpdateSheet({ open, remote, onClose, onDismiss }) {
         >
           稍后再说
         </button>
-        <p className="mt-3 text-center text-[10px] leading-relaxed text-momo-sub">
+        <button
+          type="button"
+          onClick={() => openGithubRepo()}
+          className="mt-2 w-full py-2 text-center text-[11px] text-momo underline-offset-2"
+        >
+          在 GitHub 搜索「{APP_LINKS.searchHint}」打开仓库
+        </button>
+        <p className="mt-2 text-center text-[10px] leading-relaxed text-momo-sub">
           {isAndroidApp()
-            ? '将打开 GitHub 下载 APK，下载后请在系统安装器中安装。'
-            : '网页版刷新或重新打开即可获取最新界面；大版本请按提示操作。'}
+            ? '将跳转浏览器下载 APK；也可自行在 GitHub 搜索 findmatch → Releases。'
+            : '网页版打开上述仓库或 Pages 预览；安卓请下载 APK。'}
         </p>
       </div>
     </SheetModal>

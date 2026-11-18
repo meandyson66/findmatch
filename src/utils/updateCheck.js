@@ -1,4 +1,6 @@
+import { APP_LINKS } from '../data/appLinks'
 import { APP_VERSION_CODE, APP_VERSION_NAME } from '../config/appVersion'
+import { openExternalUrl } from './openExternal'
 
 const DISMISS_KEY = 'findmatch-update-dismiss-code'
 const LAST_CHECK_KEY = 'findmatch-update-last-check'
@@ -73,13 +75,19 @@ export function markUpdateChecked() {
 
 export function openUpdateTarget(remote) {
   const url =
-    (isAndroidApp() && remote.apkUrl) || remote.releasesPage || remote.apkUrl || ''
-  if (!url) return
-  if (isAndroidApp()) {
-    window.location.href = url
-    return
-  }
-  window.open(url, '_blank', 'noopener,noreferrer')
+    (isAndroidApp() && remote?.apkUrl) ||
+    remote?.releasesPage ||
+    remote?.apkUrl ||
+    APP_LINKS.releasesLatest
+  openExternalUrl(url)
+}
+
+export function openGithubReleases() {
+  openExternalUrl(APP_LINKS.releasesLatest)
+}
+
+export function openGithubRepo() {
+  openExternalUrl(APP_LINKS.repo)
 }
 
 export function getCurrentVersionLabel() {
