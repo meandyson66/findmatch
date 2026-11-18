@@ -32,6 +32,9 @@ export function ProfileSheet({ user, open, onClose, onGreet, isFollowing, onTogg
                 <MapPin className="h-3.5 w-3.5" />
                 {user.distanceKm} km {user.online ? '· 在线' : '· 离线'}
               </p>
+              {user.vipInvest != null && (
+                <p className="mt-1 text-xs font-medium text-momo-dark">累计投资 ¥{user.vipInvest}</p>
+              )}
             </div>
           </div>
           <button type="button" onClick={onClose} className="rounded-full p-1 text-momo-sub">

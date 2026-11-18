@@ -3,7 +3,16 @@ import { inferProvinceFromCity } from './chinaRegions'
 
 export const STORAGE_KEY = 'findmatch-state-v2'
 
-const TAB_MAP = { radar: 'home', bottles: 'home', darkroom: 'me', home: 'home', messages: 'messages', me: 'me' }
+const TAB_MAP = {
+  radar: 'home',
+  bottles: 'home',
+  darkroom: 'me',
+  home: 'home',
+  vip: 'vip',
+  matchmaker: 'matchmaker',
+  messages: 'messages',
+  me: 'me',
+}
 
 const DEFAULT_NOTICES = [
   {
@@ -32,7 +41,7 @@ const DEFAULT_NOTICES = [
 export function getInitialState() {
   return {
     tab: 'home',
-    homeSubTab: 'nearby',
+    homeSubTab: 'recommend',
     user: { ...DEFAULT_USER },
     homeFilters: { gender: 'all', onlineOnly: false, maxKm: 5 },
     nearbyOverrides: {},

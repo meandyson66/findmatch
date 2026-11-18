@@ -1,4 +1,4 @@
-@tailwind base;
+﻿@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -172,5 +172,448 @@ body {
   }
   100% {
     background-position: -100% 0;
+  }
+}
+
+/* 会员区 · 头像流光边框 */
+@keyframes vip-avatar-ring-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@layer components {
+  .vip-avatar-marquee-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 1rem;
+    padding: 2px;
+    overflow: hidden;
+  }
+
+  .vip-avatar-marquee-ring::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: conic-gradient(
+      from 0deg,
+      #fbbf24,
+      #f472b6,
+      #a78bfa,
+      #22d3ee,
+      #3eb575,
+      #fbbf24
+    );
+    animation: vip-avatar-ring-spin 2.8s linear infinite;
+  }
+
+  .vip-avatar-marquee-ring::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 0.85rem;
+    background: rgba(255, 255, 255, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vip-avatar-marquee-ring::before {
+    animation: none !important;
+  }
+}
+
+/* 红娘 · 水滴质感卡片 */
+@keyframes matchmaker-blob-morph {
+  0%,
+  100% {
+    border-radius: 58% 42% 62% 38% / 48% 55% 45% 52%;
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    border-radius: 42% 58% 38% 62% / 55% 42% 58% 45%;
+    transform: rotate(6deg) scale(1.04);
+  }
+}
+
+@keyframes matchmaker-orb-float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translate(6px, -10px) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes matchmaker-shine-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-12deg);
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: translateX(220%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
+@layer components {
+  .matchmaker-droplet-card {
+    border-radius: 1.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.38) 45%,
+      rgba(224, 242, 254, 0.35) 100%
+    );
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    box-shadow:
+      0 12px 40px rgba(56, 189, 248, 0.12),
+      0 4px 16px rgba(244, 114, 182, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -8px 24px rgba(255, 255, 255, 0.35);
+  }
+
+  .matchmaker-droplet-orb {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    filter: blur(2px);
+    animation: matchmaker-orb-float 6s ease-in-out infinite;
+  }
+
+  .matchmaker-droplet-orb-a {
+    top: -28px;
+    right: -20px;
+  }
+
+  .matchmaker-droplet-orb-b {
+    bottom: -36px;
+    left: -24px;
+    animation-delay: -3s;
+    animation-duration: 7s;
+  }
+
+  .matchmaker-droplet-shine {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .matchmaker-droplet-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.55),
+      transparent
+    );
+    animation: matchmaker-shine-sweep 5.5s ease-in-out infinite;
+  }
+
+  .matchmaker-droplet-avatar-shell {
+    position: relative;
+    width: 76px;
+    height: 76px;
+  }
+
+  .matchmaker-droplet-blob {
+    position: absolute;
+    inset: 0;
+    animation: matchmaker-blob-morph 7s ease-in-out infinite;
+    opacity: 0.85;
+    filter: blur(0.3px);
+  }
+
+  .matchmaker-droplet-icon {
+    height: 1.1rem;
+    width: 1.1rem;
+    filter: drop-shadow(0 2px 4px rgba(56, 189, 248, 0.45));
+  }
+
+  .matchmaker-droplet-intro {
+    border-left: 2px solid rgba(56, 189, 248, 0.35);
+    padding-left: 0.65rem;
+  }
+
+  .matchmaker-droplet-tag {
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.42);
+    padding: 0.2rem 0.55rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .matchmaker-droplet-cta:active {
+    transform: scale(0.98);
+  }
+
+  .matchmaker-services-droplet {
+    border-radius: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matchmaker-droplet-blob,
+  .matchmaker-droplet-orb,
+  .matchmaker-droplet-shine::after {
+    animation: none !important;
+  }
+}
+
+/* 首页焦点区 · 液态 + 跑马灯 */
+@keyframes promo-marquee-x {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes promo-liquid-blob {
+  0%,
+  100% {
+    border-radius: 52% 48% 60% 40% / 50% 58% 42% 50%;
+    transform: scale(1.05) rotate(0deg);
+  }
+  50% {
+    border-radius: 44% 56% 42% 58% / 58% 44% 56% 42%;
+    transform: scale(1.12) rotate(8deg);
+  }
+}
+
+@keyframes promo-liquid-orb {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(8px, -12px);
+    opacity: 1;
+  }
+}
+
+@layer components {
+  .promo-liquid-shell {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.78) 0%,
+      rgba(255, 255, 255, 0.42) 48%,
+      rgba(186, 230, 253, 0.35) 100%
+    );
+    backdrop-filter: blur(36px) saturate(210%);
+    -webkit-backdrop-filter: blur(36px) saturate(210%);
+    box-shadow:
+      0 14px 44px rgba(59, 130, 246, 0.14),
+      0 6px 20px rgba(244, 114, 182, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -10px 28px rgba(255, 255, 255, 0.4);
+  }
+
+  .promo-liquid-orb {
+    position: absolute;
+    width: 140px;
+    height: 140px;
+    filter: blur(1px);
+    animation: promo-liquid-orb 5.5s ease-in-out infinite;
+    z-index: 0;
+  }
+
+  .promo-liquid-orb-a {
+    top: -40px;
+    right: -30px;
+  }
+
+  .promo-liquid-orb-b {
+    bottom: -50px;
+    left: -35px;
+    animation-delay: -2.5s;
+  }
+
+  .promo-liquid-shine {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .promo-liquid-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: matchmaker-shine-sweep 4.8s ease-in-out infinite;
+  }
+
+  .promo-liquid-blob {
+    position: absolute;
+    inset: 12% 8% auto 8%;
+    height: 55%;
+    z-index: 0;
+    animation: promo-liquid-blob 9s ease-in-out infinite;
+    opacity: 0.55;
+    filter: blur(8px);
+  }
+
+  .promo-type-marquee-mask,
+  .promo-caption-marquee-mask {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  }
+
+  .promo-marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+    animation: promo-marquee-x 28s linear infinite;
+  }
+
+  .promo-marquee-fast {
+    animation-duration: 18s;
+  }
+
+  .promo-marquee-paused {
+    animation-play-state: paused;
+  }
+
+  .promo-type-chip {
+    flex-shrink: 0;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    padding: 0.2rem 0.65rem;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .promo-type-video {
+    background: rgba(167, 139, 250, 0.35);
+    color: #4c1d95;
+  }
+  .promo-type-image {
+    background: rgba(251, 113, 133, 0.35);
+    color: #9f1239;
+  }
+  .promo-type-ad {
+    background: rgba(251, 191, 36, 0.4);
+    color: #78350f;
+  }
+  .promo-type-notice {
+    background: rgba(56, 189, 248, 0.35);
+    color: #0c4a6e;
+  }
+
+  .promo-caption-chip {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.42);
+    padding: 0.25rem 0.65rem;
+    font-size: 10px;
+    color: #334155;
+    white-space: nowrap;
+  }
+
+  .promo-caption-chip-active {
+    border-color: rgba(62, 181, 117, 0.55);
+    background: rgba(62, 181, 117, 0.18);
+    box-shadow: 0 0 0 1px rgba(62, 181, 117, 0.25);
+  }
+
+  .promo-caption-type {
+    border-radius: 9999px;
+    padding: 0.1rem 0.4rem;
+    font-size: 9px;
+    font-weight: 600;
+  }
+
+  .promo-slide-glass {
+    background: linear-gradient(
+      to top,
+      rgba(15, 23, 42, 0.55) 0%,
+      rgba(15, 23, 42, 0.12) 48%,
+      transparent 72%
+    );
+  }
+
+  .promo-liquid-tag {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  .promo-nav-btn {
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.28);
+    padding: 0.35rem;
+    color: #fff;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .promo-play-orb {
+    border-radius: 9999px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 24px rgba(255, 255, 255, 0.25);
+  }
+
+  .promo-dot {
+    height: 4px;
+    width: 4px;
+    border-radius: 9999px;
+    background: rgba(62, 181, 117, 0.35);
+    transition: width 0.2s ease, background 0.2s ease;
+  }
+
+  .promo-dot-active {
+    width: 18px;
+    background: rgba(62, 181, 117, 0.95);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-marquee-track,
+  .promo-liquid-blob,
+  .promo-liquid-orb,
+  .promo-liquid-shine::after {
+    animation: none !important;
   }
 }

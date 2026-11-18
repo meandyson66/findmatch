@@ -19,7 +19,7 @@ export function FilterSheet({
 }) {
   const kmOpts = allFilterKmOptions()
   return (
-    <SheetModal open={open} title="筛选附近的人" onClose={onClose}>
+    <SheetModal open={open} title="筛选推荐" onClose={onClose}>
       <div className="px-4 py-3">
         <p className="text-xs text-momo-sub">性别</p>
         <div className="mt-2 flex gap-2">

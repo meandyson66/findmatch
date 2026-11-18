@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { MomoAvatar } from '../components/MomoAvatar'
 import { ResetButton } from '../components/ResetButton'
 import { AvatarSetupSheet } from '../components/me/AvatarSetupSheet'
+import { VipCenterSheet } from '../components/me/VipCenterSheet'
 import { SheetModal } from '../components/me/SheetModal'
 import { CityPickerSheet } from '../components/home/CityPickerSheet'
 import { ProfileExtraFields, ProfileInfoGrid } from '../components/ProfileInfoGrid'
@@ -21,7 +22,6 @@ import { formatUserLocationDetail } from '../data/chinaRegions'
 import { chatIdForRadar } from '../data/storage'
 import { useApp } from '../context/AppContext'
 import { VipBadge } from '../components/VipBadge'
-import { VipCenterSheet } from '../components/me/VipCenterSheet'
 import { getVipPerks, getNextTier, vipProgress } from '../data/vip'
 import { isIdentityVerified } from '../utils/identity'
 import { getCurrentVersionLabel } from '../utils/updateCheck'
@@ -29,7 +29,6 @@ import { formatFans, formatRelative } from '../utils/formatTime'
 
 const MENU = [
   { key: 'identity', icon: ShieldCheck, label: '实名认证' },
-  { key: 'vip', icon: Crown, label: '会员中心' },
   { key: 'edit', icon: User, label: '编辑资料' },
   { key: 'viewers', icon: Eye, label: '谁看过我' },
   { key: 'settings', icon: Settings, label: '设置' },
@@ -102,8 +101,8 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
     nearbyUsers,
     patch,
     isRadarUnlocked,
-    purchaseRecharge,
     openRealNameVerify,
+    purchaseRecharge,
   } = useApp()
   const u = state.user
   const settings = u.settings ?? {}
@@ -120,6 +119,7 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
   const [avatarOpen, setAvatarOpen] = useState(false)
   const [feedbackText, setFeedbackText] = useState('')
   const [momentText, setMomentText] = useState('')
+  const [vipRechargeOpen, setVipRechargeOpen] = useState(false)
 
   useEffect(() => {
     setDraftTags(u.soulTags ?? [])
@@ -299,14 +299,14 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
 
         <button
           type="button"
-          onClick={() => openPanel('vip')}
+          onClick={() => setVipRechargeOpen(true)}
           className="mx-4 mt-3 w-[calc(100%-2rem)] overflow-hidden rounded-2xl border border-white/45 bg-gradient-to-r from-amber-500/25 via-white/35 to-violet-400/20 p-4 text-left shadow-glass-sm active:opacity-90"
         >
           <div className="flex items-center justify-between gap-2">
             <div>
               <p className="flex items-center gap-1 text-xs text-momo-sub">
                 <Crown className="h-3.5 w-3.5" />
-                会员与充值
+                会员充值
               </p>
               <p className="mt-1 text-sm font-semibold text-momo-text">
                 {vipPerks.tier.name}会员 · {u.coinBalance ?? 0} 寻伴币
@@ -330,6 +330,13 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
               />
             </div>
           )}
+        </button>
+        <button
+          type="button"
+          onClick={() => patch({ tab: 'vip' })}
+          className="mx-4 mt-2 w-[calc(100%-2rem)] py-2 text-center text-[11px] text-momo-sub active:text-momo"
+        >
+          看看平台会员嘉宾
         </button>
 
         <div className="glass-panel mx-4 mt-4 flex py-4">
@@ -506,15 +513,6 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
         </div>
       </SheetModal>
 
-      <VipCenterSheet
-        open={panel === 'vip'}
-        onClose={() => setPanel(null)}
-        totalRecharge={u.vipTotalRecharge ?? 0}
-        coinBalance={u.coinBalance ?? 0}
-        rechargeHistory={u.rechargeHistory}
-        onPurchase={purchaseRecharge}
-      />
-
       <SheetModal open={panel === 'viewers'} title="谁看过我" onClose={() => setPanel(null)} tall>
         <p className="border-b border-white/40 px-4 py-2 text-[11px] text-momo-sub">
           {vipPerks.viewerShow < 999
@@ -557,7 +555,10 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
           {vipPerks.viewerShow < (u.profileViews ?? []).length && (
             <button
               type="button"
-              onClick={() => openPanel('vip')}
+              onClick={() => {
+                setPanel(null)
+                setVipRechargeOpen(true)
+              }}
               className="w-full py-3 text-center text-xs text-momo"
             >
               升级会员查看全部 {(u.profileViews ?? []).length} 条记录
@@ -603,7 +604,14 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
               <p className="text-sm text-momo-text">隐身访问</p>
               <p className="text-[11px] text-momo-sub">
                 至尊会员专属 ·{' '}
-                <button type="button" onClick={() => openPanel('vip')} className="text-momo underline">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPanel(null)
+                    setVipRechargeOpen(true)
+                  }}
+                  className="text-momo underline"
+                >
                   去升级
                 </button>
               </p>
@@ -793,6 +801,15 @@ export function MePage({ onOpenChat, onCheckUpdate, updateChecking, updateMessag
         user={u}
         onApply={(partial) => updateUser(partial)}
         onToast={showToast}
+      />
+
+      <VipCenterSheet
+        open={vipRechargeOpen}
+        onClose={() => setVipRechargeOpen(false)}
+        totalRecharge={u.vipTotalRecharge ?? 0}
+        coinBalance={u.coinBalance ?? 0}
+        rechargeHistory={u.rechargeHistory}
+        onPurchase={purchaseRecharge}
       />
     </div>
   )

@@ -1,16 +1,20 @@
 import { motion, useReducedMotion } from 'framer-motion'
-import { Home, MessageCircle, UserRound } from 'lucide-react'
+import { Crown, HeartHandshake, Home, MessageCircle, UserRound } from 'lucide-react'
 import { useMemo } from 'react'
 import { useApp } from '../context/AppContext'
 
 const TABS = [
   { id: 'home', label: '首页', Icon: Home },
+  { id: 'vip', label: '会员', Icon: Crown },
+  { id: 'matchmaker', label: '红娘', Icon: HeartHandshake },
   { id: 'messages', label: '消息', Icon: MessageCircle },
   { id: 'me', label: '我的', Icon: UserRound },
 ]
 
 const TAB_ACCENT = {
   home: { a: '#3EB575', b: '#22D3EE', glow: '62,181,117' },
+  vip: { a: '#E8B84A', b: '#F59E0B', glow: '232,184,74' },
+  matchmaker: { a: '#F472B6', b: '#FB7185', glow: '244,114,182' },
   messages: { a: '#C084FC', b: '#F472B6', glow: '168,85,247' },
   me: { a: '#FBBF24', b: '#FB923C', glow: '251,191,36' },
 }
@@ -28,7 +32,7 @@ export function BottomNav() {
   const activeAccent = TAB_ACCENT[state.tab] ?? TAB_ACCENT.home
 
   return (
-    <nav className="glass-nav tab-nav-aurora relative z-30 shrink-0 overflow-hidden pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5">
+    <nav className="glass-nav tab-nav-aurora relative z-30 shrink-0 overflow-hidden pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1">
       {!reduceMotion && (
         <motion.div
           className="pointer-events-none absolute inset-x-0 top-0 h-16 opacity-80"
@@ -43,13 +47,13 @@ export function BottomNav() {
         />
       )}
 
-      <ul className="relative flex items-stretch justify-around px-1">
+      <ul className="relative flex items-stretch justify-between px-0.5">
         {TABS.map(({ id, label, Icon }) => {
           const active = state.tab === id
           const accent = TAB_ACCENT[id]
 
           return (
-            <li key={id} className="flex-1">
+            <li key={id} className="min-w-0 flex-1">
               <motion.button
                 type="button"
                 onClick={() => patch({ tab: id })}
@@ -60,7 +64,7 @@ export function BottomNav() {
                 {active && !reduceMotion && (
                   <motion.span
                     layoutId="tab-active-pill"
-                    className="absolute inset-x-2 bottom-0 top-0 rounded-2xl"
+                    className="absolute inset-x-1 bottom-0 top-0 rounded-2xl"
                     style={{
                       background: `linear-gradient(135deg, rgba(${accent.glow},0.22), rgba(255,255,255,0.35))`,
                       boxShadow: `0 8px 28px rgba(${accent.glow},0.35), inset 0 1px 0 rgba(255,255,255,0.65)`,
@@ -69,7 +73,7 @@ export function BottomNav() {
                   />
                 )}
 
-                <span className="relative flex h-9 w-9 items-center justify-center">
+                <span className="relative flex h-8 w-8 items-center justify-center">
                   {active && !reduceMotion && (
                     <motion.span
                       className="absolute inset-0 rounded-full blur-md"
@@ -89,21 +93,14 @@ export function BottomNav() {
                       reduceMotion
                         ? {}
                         : {
-                            scale: active ? 1.14 : 1,
-                            y: active ? -2 : 0,
-                            rotate: active && id === 'home' ? [0, -6, 6, 0] : 0,
+                            scale: active ? 1.12 : 1,
+                            y: active ? -1 : 0,
                           }
                     }
-                    transition={
-                      active
-                        ? id === 'home'
-                          ? { rotate: { duration: 0.5 }, scale: spring, y: spring }
-                          : spring
-                        : spring
-                    }
+                    transition={spring}
                   >
                     <Icon
-                      className="h-[22px] w-[22px] drop-shadow-sm"
+                      className="h-5 w-5 drop-shadow-sm"
                       strokeWidth={active ? 2.35 : 1.75}
                       style={{
                         color: active ? accent.a : '#8E8E93',
@@ -115,16 +112,11 @@ export function BottomNav() {
                   </motion.span>
                   {id === 'messages' && unread > 0 && (
                     <motion.span
-                      className="absolute -right-1 -top-0.5 z-20 flex h-4 min-w-4 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-400 px-1 text-[9px] font-bold text-white shadow-md"
+                      className="absolute -right-1 -top-0.5 z-20 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-gradient-to-br from-rose-500 to-orange-400 px-0.5 text-[8px] font-bold text-white shadow-md"
                       initial={{ scale: 0 }}
-                      animate={
-                        reduceMotion
-                          ? { scale: 1 }
-                          : { scale: [1, 1.15, 1], boxShadow: ['0 0 0 rgba(0,0,0,0)', '0 0 12px rgba(244,63,94,0.6)', '0 0 0 rgba(0,0,0,0)'] }
-                      }
+                      animate={reduceMotion ? { scale: 1 } : { scale: [1, 1.15, 1] }}
                       transition={{
                         scale: { duration: 1.6, repeat: Infinity, ease: 'easeInOut' },
-                        boxShadow: { duration: 1.6, repeat: Infinity, ease: 'easeInOut' },
                       }}
                     >
                       {unread > 9 ? '9+' : unread}
@@ -133,12 +125,12 @@ export function BottomNav() {
                 </span>
 
                 <motion.span
-                  className="relative z-10 text-[11px]"
+                  className="relative z-10 max-w-full truncate px-0.5 text-[10px]"
                   animate={
                     reduceMotion
                       ? {}
                       : {
-                          scale: active ? 1.05 : 1,
+                          scale: active ? 1.04 : 1,
                           opacity: active ? 1 : 0.82,
                         }
                   }
@@ -159,7 +151,7 @@ export function BottomNav() {
                 {active && !reduceMotion && (
                   <motion.span
                     layoutId="tab-underline"
-                    className="absolute bottom-0.5 h-0.5 w-5 rounded-full"
+                    className="absolute bottom-0.5 h-0.5 w-4 rounded-full"
                     style={{
                       background: `linear-gradient(90deg, ${accent.a}, ${accent.b})`,
                       boxShadow: `0 0 10px rgba(${accent.glow},0.9)`,

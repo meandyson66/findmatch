@@ -5,8 +5,10 @@ import { ChatRoom } from './components/chat/ChatRoom'
 import { PhoneFrame } from './components/PhoneFrame'
 import { useApp } from './context/AppContext'
 import { HomePage } from './pages/HomePage'
+import { MatchmakerPage } from './pages/MatchmakerPage'
 import { MessagesPage } from './pages/MessagesPage'
 import { MePage } from './pages/MePage'
+import { VipPage } from './pages/VipPage'
 import { AppUpdateBanner, AppUpdateSheet } from './components/me/AppUpdateSheet'
 import { useAppUpdate } from './hooks/useAppUpdate'
 
@@ -44,6 +46,8 @@ export default function App() {
         )}
         <div className="min-h-0 flex-1 overflow-hidden">
           {state.tab === 'home' && <HomePage onOpenChat={openChat} />}
+          {state.tab === 'vip' && <VipPage onOpenChat={openChat} />}
+          {state.tab === 'matchmaker' && <MatchmakerPage />}
           {state.tab === 'messages' && <MessagesPage onOpenChat={openChat} />}
           {state.tab === 'me' && (
             <MePage

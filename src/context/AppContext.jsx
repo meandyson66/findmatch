@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { NEARBY_USERS } from '../data/mockData'
+import { findVipMemberProfile } from '../data/vipMembers'
 import { RECHARGE_PACKAGES, getVipPerks } from '../data/vip'
 import { chatIdForRadar, loadState, resetState, saveState } from '../data/storage'
 import { RealNameVerifySheet } from '../components/me/RealNameVerifySheet'
@@ -149,7 +150,8 @@ export function AppProvider({ children }) {
   const completeSoulQuiz = useCallback((profileId, answers, matched) => {
     if (!matched) return null
     const chatId = chatIdForRadar(profileId)
-    const profile = NEARBY_USERS.find((p) => p.id === profileId)
+    const profile =
+      NEARBY_USERS.find((p) => p.id === profileId) ?? findVipMemberProfile(profileId)
     const now = Date.now()
     let outcome = null
     setState((s) => {

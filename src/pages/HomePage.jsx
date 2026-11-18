@@ -3,7 +3,9 @@ import { useMemo, useState } from 'react'
 import { chatIdForRadar } from '../data/storage'
 import { CityPickerSheet } from '../components/home/CityPickerSheet'
 import { formatUserLocation } from '../data/chinaRegions'
-import { MomoAvatar } from '../components/MomoAvatar'
+import { HomeFeedSection } from '../components/home/HomeFeedSection'
+import { HomeSiteFooter } from '../components/home/HomeSiteFooter'
+import { HomePromoShowcase } from '../components/home/HomePromoShowcase'
 import { FilterSheet } from '../components/home/FilterSheet'
 import { ProfileSheet } from '../components/home/ProfileSheet'
 import { SoulQuizModal } from '../components/radar/SoulQuizModal'
@@ -12,51 +14,6 @@ import { useApp } from '../context/AppContext'
 import { getVipPerks } from '../data/vip'
 import { isIdentityVerified } from '../utils/identity'
 import { formatRelative } from '../utils/formatTime'
-
-function NearbyRow({ user, onGreet, onOpen, greeted }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onOpen(user.id)}
-      className="glass-row glass-row-active flex w-full items-center gap-3 px-3 py-3 text-left"
-    >
-      <MomoAvatar nickname={user.nickname} accent={user.accent} size={56} online={user.online} />
-      <div className="min-w-0 flex-1">
-        <p className="flex items-center gap-1.5">
-          <span className="truncate text-[15px] font-medium text-momo-text">{user.nickname}</span>
-          <span className="shrink-0 text-xs text-momo-sub">
-            {user.age} · {user.gender}
-          </span>
-        </p>
-        <p className="mt-0.5 truncate text-xs text-momo-sub">{user.bio}</p>
-        <p className="mt-1 text-[10px] text-momo-sub">
-          {[user.education, user.income].filter(Boolean).join(' · ')}
-          {[user.education, user.income].some(Boolean) ? ' · ' : ''}
-          {user.distanceKm}km · {user.soulTags.slice(0, 2).join(' · ')}
-        </p>
-      </div>
-      <span
-        role="button"
-        tabIndex={0}
-        onClick={(e) => {
-          e.stopPropagation()
-          onGreet(user.id)
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.stopPropagation()
-            onGreet(user.id)
-          }
-        }}
-        className={`shrink-0 rounded-md px-3 py-1.5 text-xs font-medium ${
-          greeted ? 'bg-white/50 text-momo-text' : 'glass-primary-btn active:opacity-90'
-        }`}
-      >
-        {greeted ? '发消息' : '打招呼'}
-      </span>
-    </button>
-  )
-}
 
 function RecommendCard({ user, onOpen }) {
   return (
@@ -111,7 +68,6 @@ export function HomePage({ onOpenChat }) {
     updateUser,
     openRealNameVerify,
   } = useApp()
-  const sub = state.homeSubTab ?? 'nearby'
   const filters = state.homeFilters ?? { gender: 'all', onlineOnly: false, maxKm: 5 }
   const vipPerks = useMemo(
     () => getVipPerks(state.user.vipTotalRecharge ?? 0),
@@ -131,11 +87,6 @@ export function HomePage({ onOpenChat }) {
     () => nearbyUsers.map((u) => getMergedUser(u)),
     [nearbyUsers, getMergedUser]
   )
-
-  const filtered = useMemo(() => {
-    if (!state.user.radarOn) return []
-    return applyFilters(merged, filters, search).sort((a, b) => a.distanceKm - b.distanceKm)
-  }, [merged, filters, search, state.user.radarOn])
 
   const recommend = useMemo(
     () => applyFilters(merged.filter((u) => u.recommend), filters, search),
@@ -208,7 +159,7 @@ export function HomePage({ onOpenChat }) {
     refreshNearby()
     setTimeout(() => {
       setRefreshing(false)
-      showToast('附近列表已更新')
+      showToast('推荐列表已更新')
     }, 600)
   }
 
@@ -233,7 +184,7 @@ export function HomePage({ onOpenChat }) {
               onClick={doRefresh}
               disabled={refreshing}
               className="rounded-full p-1.5 text-momo-text active:bg-white/40 disabled:opacity-50"
-              title="刷新附近"
+              title="刷新推荐"
             >
               <RefreshCw className={`h-5 w-5 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
@@ -262,94 +213,37 @@ export function HomePage({ onOpenChat }) {
             </button>
           )}
         </div>
+        <HomePromoShowcase
+          onNavigate={(tab) => patch({ tab })}
+          onToast={showToast}
+        />
         {state.homeRefreshAt && (
           <p className="mt-1 text-center text-[10px] text-momo-sub">
             上次刷新 {formatRelative(state.homeRefreshAt)}
           </p>
         )}
-        <div className="mt-3 flex gap-6 border-b border-white/45">
-          {[
-            { id: 'nearby', label: '附近' },
-            { id: 'recommend', label: '推荐' },
-          ].map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => patch({ homeSubTab: t.id })}
-              className={`relative pb-2 text-[15px] ${
-                sub === t.id ? 'font-semibold text-momo-text' : 'text-momo-sub'
-              }`}
-            >
-              {t.label}
-              {sub === t.id && (
-                <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-momo" />
-              )}
-            </button>
-          ))}
-        </div>
+        <p className="mt-2 text-[13px] font-medium text-momo-text">精选推荐</p>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {sub === 'nearby' && (
-          <>
-            {!state.user.radarOn && (
-              <p className="glass-panel mx-3 mt-2 px-4 py-8 text-center text-sm text-momo-sub">
-                你已在「我的」中关闭位置展示，附近列表已隐藏
-                <br />
-                <button
-                  type="button"
-                  onClick={() => patch({ tab: 'me' })}
-                  className="mt-3 text-momo underline"
-                >
-                  去开启
-                </button>
-              </p>
-            )}
-            {state.user.radarOn && filtered.length === 0 && (
-              <p className="glass-panel mx-3 mt-2 px-4 py-8 text-center text-sm text-momo-sub">
-                没有符合筛选条件的人
-                <button
-                  type="button"
-                  onClick={() => {
-                    setHomeFilters({ gender: 'all', onlineOnly: false, maxKm: 5 })
-                    setSearch('')
-                  }}
-                  className="mt-2 block w-full text-momo"
-                >
-                  清除筛选
-                </button>
-              </p>
-            )}
-            {state.user.radarOn &&
-              filtered.map((u) => (
-                <NearbyRow
-                  key={u.id}
-                  user={u}
-                  greeted={isRadarUnlocked(u.id)}
-                  onGreet={greet}
-                  onOpen={setProfileId}
-                />
-              ))}
-          </>
-        )}
-        {sub === 'recommend' && vipPerks.priorityExpose && (
+        {vipPerks.priorityExpose && (
           <p className="mx-3 mt-2 rounded-lg border border-momo/25 bg-momo/10 px-3 py-2 text-center text-[11px] text-momo-dark">
             钻石及以上：你的资料已在推荐位优先展示（演示）
           </p>
         )}
-        {sub === 'recommend' && (
-          <div className="grid grid-cols-2 gap-2 p-2">
-            {recommend.length === 0 ? (
-              <p className="glass-panel col-span-2 px-4 py-8 text-center text-sm text-momo-sub">
-                暂无推荐，试试调整筛选
-              </p>
-            ) : (
-              recommend.map((u) => (
-                <RecommendCard key={u.id} user={u} onOpen={setProfileId} />
-              ))
-            )}
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-2 p-2">
+          {recommend.length === 0 ? (
+            <p className="glass-panel col-span-2 px-4 py-8 text-center text-sm text-momo-sub">
+              暂无推荐，试试调整筛选
+            </p>
+          ) : (
+            recommend.map((u) => (
+              <RecommendCard key={u.id} user={u} onOpen={setProfileId} />
+            ))
+          )}
+        </div>
+        <HomeFeedSection onToast={showToast} />
+        <HomeSiteFooter />
       </div>
 
       {toast && (
@@ -366,7 +260,7 @@ export function HomePage({ onOpenChat }) {
         onReset={() => applyHomeFilters({ gender: 'all', onlineOnly: false, maxKm: 5 })}
         maxFilterKm={vipPerks.maxFilterKm}
         onNeedVip={() => {
-          showToast('该距离需更高会员等级，请到「我的」会员中心充值')
+          showToast('该距离需更高会员等级，请到「我的」充值')
           patch({ tab: 'me' })
         }}
       />
