@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.7",
-  "versionCode": 8,
-  "releaseNotes": "底部液态玻璃 Dock + 五 Tab 切换图标动效；会员列表隐藏投资金额；资料卡不再展示他人累计投资。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.7/app-release.apk",
+  "versionName": "0.1.8",
+  "versionCode": 9,
+  "releaseNotes": "红娘 Tab 图标：双手靠拢后化为爱心握手；其余 Tab 切换动效与液态底栏保留。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.8/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

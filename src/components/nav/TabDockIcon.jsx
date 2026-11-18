@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Crown, HeartHandshake, Home, MessageCircle, Sparkles, UserRound } from 'lucide-react'
+import { Crown, Hand, HeartHandshake, Home, MessageCircle, Sparkles, UserRound } from 'lucide-react'
 
 function iconPaint(active, accent, glow) {
   return {
@@ -87,35 +87,94 @@ function VipTabIcon({ active, play, accent, glow, stroke, playKey }) {
   )
 }
 
-/** 红娘：爱心握手挤压 + 心形脉动 */
+/** 红娘：切换时左右两手靠拢 → 化成爱心握手（最终图标） */
 function MatchmakerTabIcon({ active, play, accent, glow, stroke, playKey }) {
+  const paint = iconPaint(active, accent, glow)
+  const seqDuration = 0.82
+  const handEase = [0.36, 1.28, 0.64, 1]
+
   return (
     <motion.div
       className="relative flex h-5 w-5 items-center justify-center"
       key={play ? `mm-${playKey}` : 'mm'}
-      initial={play ? { scale: 0.7, rotate: -16, x: -6 } : false}
-      animate={
-        active
-          ? play
-            ? {
-                scale: [0.7, 1.25, 0.95, 1.12],
-                rotate: [-16, 12, -8, 0],
-                x: [-6, 4, -2, 0],
-              }
-            : { scale: 1.12, rotate: 0, x: 0 }
-          : { scale: 1, rotate: 0, x: 0 }
-      }
-      transition={{ duration: 0.68, ease: [0.36, 1.42, 0.64, 1] }}
+      aria-hidden
     >
-      <HeartHandshake className="h-5 w-5" strokeWidth={stroke} style={iconPaint(active, accent, glow)} />
+      {/* 过程动画：仅切换瞬间出现双手 */}
+      {play && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: [1, 1, 1, 0.35, 0], scale: [0.95, 1, 1.02, 0.98, 0.9] }}
+          transition={{ duration: seqDuration, times: [0, 0.22, 0.5, 0.72, 1], ease: 'easeInOut' }}
+        >
+          <motion.div
+            className="relative flex h-5 w-5 items-center justify-center"
+            animate={{ rotate: [0, 0, -4, 4, -2, 0] }}
+            transition={{ duration: seqDuration, times: [0, 0.42, 0.55, 0.65, 0.78, 1] }}
+          >
+            <motion.div
+              className="absolute"
+              initial={{ x: -17, rotate: -34, opacity: 1 }}
+              animate={{
+                x: [-17, -17, -8, -1.5, -1.5],
+                rotate: [-34, -30, -18, -10, -10],
+                opacity: [1, 1, 1, 1, 0.7],
+              }}
+              transition={{ duration: seqDuration, times: [0, 0.18, 0.44, 0.58, 1], ease: handEase }}
+            >
+              <Hand
+                className="h-[18px] w-[18px]"
+                strokeWidth={stroke}
+                style={{ ...paint, transform: 'scaleX(-1)' }}
+              />
+            </motion.div>
+            <motion.div
+              className="absolute"
+              initial={{ x: 17, rotate: 34, opacity: 1 }}
+              animate={{
+                x: [17, 17, 8, 1.5, 1.5],
+                rotate: [34, 30, 18, 10, 10],
+                opacity: [1, 1, 1, 1, 0.7],
+              }}
+              transition={{ duration: seqDuration, times: [0, 0.18, 0.44, 0.58, 1], ease: handEase }}
+            >
+              <Hand className="h-[18px] w-[18px]" strokeWidth={stroke} style={paint} />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* 最终常态：爱心握手（动效后半段才显现） */}
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
+        initial={play ? { opacity: 0, scale: 0.35, y: 2 } : false}
+        animate={
+          active
+            ? play
+              ? {
+                  opacity: [0, 0, 0, 0.4, 1],
+                  scale: [0.35, 0.35, 0.35, 0.95, 1.14],
+                  y: [2, 2, 2, -1, -2],
+                }
+              : { opacity: 1, scale: 1.12, y: -2 }
+            : { opacity: 1, scale: 1, y: 0 }
+        }
+        transition={
+          play
+            ? { duration: seqDuration, times: [0, 0.5, 0.58, 0.78, 1], ease: [0.34, 1.45, 0.64, 1] }
+            : pop
+        }
+      >
+        <HeartHandshake className="h-5 w-5" strokeWidth={stroke} style={paint} />
+      </motion.div>
+
       {play && (
         <motion.span
-          className="pointer-events-none absolute inset-0 rounded-full"
+          className="pointer-events-none absolute inset-0 z-30 rounded-full"
           style={{ border: `1px solid rgba(${glow},0.45)` }}
-          initial={{ scale: 0.6, opacity: 0.8 }}
-          animate={{ scale: [0.6, 1.65], opacity: [0.8, 0] }}
-          transition={{ duration: 0.55, ease: 'easeOut' }}
-          aria-hidden
+          initial={{ scale: 0.55, opacity: 0.85 }}
+          animate={{ scale: [0.55, 1.75], opacity: [0.85, 0] }}
+          transition={{ duration: 0.55, delay: 0.48, ease: 'easeOut' }}
         />
       )}
     </motion.div>
