@@ -26,7 +26,7 @@ export function MomoAvatar({
         }
       >
         {imageUrl ? (
-          <img src={imageUrl} alt="" className="h-full w-full object-cover" />
+          <img src={imageUrl} alt="" className="h-full w-full object-cover object-top" />
         ) : emoji ? (
           emoji
         ) : (
