@@ -87,6 +87,139 @@ body {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
   }
 
+  /* 底部 Tab · Apple 液态悬浮 Dock */
+  .tab-liquid-dock-wrap {
+    pointer-events: none;
+    position: relative;
+    z-index: 30;
+    flex-shrink: 0;
+    padding: 0.35rem 0.65rem 0;
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.35), transparent 72%);
+  }
+
+  .tab-liquid-dock {
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    background: linear-gradient(
+      168deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.55) 42%,
+      rgba(236, 254, 245, 0.48) 100%
+    );
+    backdrop-filter: blur(48px) saturate(220%);
+    -webkit-backdrop-filter: blur(48px) saturate(220%);
+    box-shadow:
+      0 22px 48px rgba(15, 23, 42, 0.14),
+      0 8px 22px rgba(62, 181, 117, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.98),
+      inset 0 -14px 24px rgba(255, 255, 255, 0.35),
+      inset 0 2px 4px rgba(255, 255, 255, 0.55);
+    transform: translateZ(0);
+  }
+
+  .tab-liquid-dock::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      ellipse 120% 80% at 50% -30%,
+      rgba(255, 255, 255, 0.9),
+      transparent 55%
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .tab-liquid-dock::after {
+    content: '';
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: 3px;
+    height: 1px;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(62, 181, 117, 0.25),
+      rgba(192, 132, 252, 0.22),
+      transparent
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .tab-dock-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 0;
+    animation: tab-dock-orb 6.5s ease-in-out infinite;
+  }
+
+  .tab-dock-orb-a {
+    top: -36px;
+    left: 8%;
+    width: 100px;
+    height: 72px;
+  }
+
+  .tab-dock-orb-b {
+    bottom: -40px;
+    right: 6%;
+    width: 110px;
+    height: 80px;
+    animation-delay: -3.2s;
+  }
+
+  .tab-dock-shine {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .tab-dock-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    animation: tab-dock-shine-sweep 5.2s ease-in-out infinite;
+  }
+
+  .tab-dock-pill {
+    border-radius: 1.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.88),
+      rgba(255, 255, 255, 0.42)
+    );
+    box-shadow:
+      0 10px 26px rgba(15, 23, 42, 0.12),
+      0 4px 12px rgba(62, 181, 117, 0.12),
+      inset 0 2px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -6px 14px rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  .tab-dock-icon-stage {
+    transform-style: preserve-3d;
+    perspective: 600px;
+  }
+
   .glass-row {
     border-bottom: 1px solid rgba(255, 255, 255, 0.4);
     background: rgba(255, 255, 255, 0.38);
@@ -146,10 +279,11 @@ body {
   .tab-nav-aurora::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: -40%;
-    right: -40%;
+    top: 2px;
+    left: 8%;
+    right: 8%;
     height: 2px;
+    border-radius: 999px;
     background: linear-gradient(
       90deg,
       transparent,
@@ -172,6 +306,33 @@ body {
   }
   100% {
     background-position: -100% 0;
+  }
+}
+
+@keyframes tab-dock-orb {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate(6px, -8px) scale(1.08);
+    opacity: 0.95;
+  }
+}
+
+@keyframes tab-dock-shine-sweep {
+  0%,
+  100% {
+    transform: translateX(-120%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.85;
+  }
+  48% {
+    transform: translateX(220%);
+    opacity: 0;
   }
 }
 
@@ -613,7 +774,10 @@ body {
   .promo-marquee-track,
   .promo-liquid-blob,
   .promo-liquid-orb,
-  .promo-liquid-shine::after {
+  .promo-liquid-shine::after,
+  .tab-dock-orb,
+  .tab-dock-shine::after,
+  .tab-nav-aurora::before {
     animation: none !important;
   }
 }

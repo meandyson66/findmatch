@@ -236,6 +236,7 @@ function enrichMember(m) {
   return {
     ...m,
     tier,
+    /** 运营/后台统计用，禁止在 C 端展示 */
     vipInvest: m.vipInvest ?? tier.minRecharge + (n % 4) * 22,
     education: m.education ?? (['本科', '硕士', '大专'])[n % 3],
     jobTitle: m.jobTitle ?? (['产品经理', '设计师', '教师', '工程师'])[n % 4],
@@ -277,12 +278,12 @@ export function findVipMemberProfile(id) {
     income: row.income,
     heightCm: row.heightCm,
     marital: row.marital,
-    vipInvest: row.vipInvest,
     vipLevel: row.vipLevel,
     avatarImage: row.avatarImage,
   }
 }
 
+/** 后台对账展示（勿用于会员 Tab / 资料卡等 C 端） */
 export function formatVipInvest(yuan) {
   return `¥${yuan}`
 }

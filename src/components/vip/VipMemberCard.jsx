@@ -1,8 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { VipMarqueeAvatar } from './VipMarqueeAvatar'
 import { VipBadge } from '../VipBadge'
-import { formatVipInvest } from '../../data/vipMembers'
-
 function summaryLine(m) {
   return [
     `${m.gender} ${m.age}`,
@@ -25,9 +23,6 @@ export function VipMemberCard({ member, onPress }) {
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="truncate text-sm font-medium text-momo-text">{member.nickname}</span>
           <VipBadge level={member.vipLevel} />
-          <span className="text-[11px] font-medium text-momo-dark">
-            投资 {formatVipInvest(member.vipInvest)}
-          </span>
         </div>
         <p className="mt-0.5 truncate text-[11px] text-momo-sub">{summaryLine(member)}</p>
       </div>

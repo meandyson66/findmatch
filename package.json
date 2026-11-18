@@ -2,7 +2,7 @@
   "name": "findmatch",
   "description": "寻伴 FindMatch 附近交友演示 · GitHub: meandyson66/findmatch · APK Releases",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.1.7",
   "type": "module",
   "scripts": {
     "dev": "vite",

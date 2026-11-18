@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.6",
-  "versionCode": 7,
-  "releaseNotes": "演示头像改为 Pexels 华裔气质人像（女嘉宾妆造片、男嘉宾商务休闲）；焦点展示图同步为中国风场景。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.6/app-release.apk",
+  "versionName": "0.1.7",
+  "versionCode": 8,
+  "releaseNotes": "底部液态玻璃 Dock + 五 Tab 切换图标动效；会员列表隐藏投资金额；资料卡不再展示他人累计投资。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.7/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }
