@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.16",
-  "versionCode": 17,
-  "releaseNotes": "水滴加大 50%、透明拖动手柄；图标特效置于上层不被遮挡；滑到下一 Tab 弹性抖动加强。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.16/app-release.apk",
+  "versionName": "0.1.17",
+  "versionCode": 18,
+  "releaseNotes": "修复点水滴无法拖动（坐标命中 + Touch）；水滴更软、弹性幅度加大；底栏拖动与 Tab 切换优化。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.17/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

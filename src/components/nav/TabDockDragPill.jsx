@@ -1,14 +1,16 @@
-import { motion, useReducedMotion } from 'framer-motion'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { animate, motion, useMotionValue, useReducedMotion } from 'framer-motion'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { MAIN_TAB_IDS, TAB_ACCENT, tabIndex } from './tabConfig'
 
-const slideSpring = { type: 'spring', stiffness: 185, damping: 14, mass: 1.15 }
-const landSpring = { type: 'spring', stiffness: 260, damping: 11, mass: 1.08 }
+const slideSpring = { type: 'spring', stiffness: 175, damping: 12, mass: 1.18 }
+const landSpring = { type: 'spring', stiffness: 290, damping: 9, mass: 1.05 }
+const settleSpring = { type: 'spring', stiffness: 240, damping: 11, mass: 1.02 }
 const BASE_WIDTH_RATIO = 0.76
 const SIZE_SCALE = 1.5
 const WIDTH_RATIO = Math.min(0.92, BASE_WIDTH_RATIO * SIZE_SCALE)
 const HEIGHT_TO_WIDTH = Math.min(1.12, 0.95 * SIZE_SCALE)
 const INSET_Y = 0
+const DRAG_THRESHOLD_PX = 4
 
 function pillMetricsForCell(cellW, cellH) {
   const width = Math.round(cellW * WIDTH_RATIO)
@@ -38,8 +40,14 @@ function readDockLayout(rowEl, itemRefs, activeIndex) {
   const minLeft = firstRect.left - rowRect.left + (firstRect.width - firstPill.width) / 2
   const maxLeft = lastRect.left - rowRect.left + (lastRect.width - lastPill.width) / 2
 
-  const hitPadX = Math.round(width * 0.22)
+  const hitPadX = Math.round(width * 0.3)
   const hitPadY = Math.round(height * 0.2)
+  const hitLeft = left - hitPadX
+  const hitTop = top - hitPadY
+  const hitWidth = width + hitPadX * 2
+  const hitHeight = height + hitPadY * 2
+  const minHitLeft = minLeft - hitPadX
+  const maxHitLeft = maxLeft - hitPadX
 
   const centers = MAIN_TAB_IDS.map((_, i) => {
     const el = itemRefs.current[i]
@@ -53,13 +61,15 @@ function readDockLayout(rowEl, itemRefs, activeIndex) {
     top,
     width,
     height,
-    minLeft,
-    maxLeft,
+    minHitLeft,
+    maxHitLeft,
     centers,
-    hitLeft: left - hitPadX,
-    hitTop: top - hitPadY,
-    hitWidth: width + hitPadX * 2,
-    hitHeight: height + hitPadY * 2,
+    hitLeft,
+    hitTop,
+    hitWidth,
+    hitHeight,
+    minDragX: minHitLeft - hitLeft,
+    maxDragX: maxHitLeft - hitLeft,
   }
 }
 
@@ -91,10 +101,14 @@ export function TabDockDragPill({
 }) {
   const reduceMotion = useReducedMotion()
   const dragLayerRef = useRef(null)
+  const layoutRef = useRef(null)
+  const dragGesture = useRef({ pointerX: 0, baseX: 0, active: false })
+  const pendingDrag = useRef(null)
   const [layout, setLayout] = useState(null)
   const [dragging, setDragging] = useState(false)
   const [landTick, setLandTick] = useState(0)
   const landMounted = useRef(false)
+  const offsetX = useMotionValue(0)
   const committedIndex = tabIndex(committedId)
   const accent = TAB_ACCENT[visualId] ?? TAB_ACCENT.home
 
@@ -104,13 +118,17 @@ export function TabDockDragPill({
       return
     }
     setLandTick((n) => n + 1)
-  }, [committedId])
+    offsetX.set(0)
+  }, [committedId, offsetX])
 
   const measure = useCallback(() => {
     const row = rowRef.current
     if (!row) return
     const next = readDockLayout(row, itemRefs, committedIndex)
-    if (next) setLayout(next)
+    if (next) {
+      layoutRef.current = next
+      setLayout(next)
+    }
   }, [committedIndex, itemRefs, rowRef])
 
   useLayoutEffect(() => {
@@ -122,36 +140,177 @@ export function TabDockDragPill({
     return () => ro.disconnect()
   }, [measure, rowRef])
 
-  const dragConstraints = useMemo(() => {
-    if (!layout) return { left: 0, right: 0 }
-    const padX = layout.hitLeft - layout.left
-    return {
-      left: layout.minLeft - layout.left - padX,
-      right: layout.maxLeft - layout.left + padX,
-    }
-  }, [layout])
-
   const previewAtPointer = useCallback(() => {
     const row = rowRef.current
     const layer = dragLayerRef.current
-    if (!row || !layer || !layout) return
-    const idx = pickIndexFromCenter(row, layer, layout)
+    const L = layoutRef.current
+    if (!row || !layer || !L) return
+    const idx = pickIndexFromCenter(row, layer, L)
     if (idx == null) return
     const id = MAIN_TAB_IDS[idx]
     if (id) onDragPreview?.(id)
-  }, [layout, onDragPreview, rowRef])
+  }, [onDragPreview, rowRef])
 
   const commitFromDrag = useCallback(() => {
     const row = rowRef.current
     const layer = dragLayerRef.current
-    if (!row || !layer || !layout) return
-    const idx = pickIndexFromCenter(row, layer, layout)
+    const L = layoutRef.current
+    if (!row || !layer || !L) return
+    const idx = pickIndexFromCenter(row, layer, L)
     onDragPreview?.(null)
-    setDragging(false)
-    if (idx == null) return
     const nextId = MAIN_TAB_IDS[idx]
     if (nextId && nextId !== committedId) onSelect(nextId)
-  }, [committedId, layout, onDragPreview, onSelect, rowRef])
+    animate(offsetX, 0, settleSpring)
+  }, [committedId, offsetX, onDragPreview, onSelect, rowRef])
+
+  useEffect(() => {
+    const row = rowRef.current
+    if (!row || reduceMotion) return undefined
+
+    const clampDrag = (dx) => {
+      const L = layoutRef.current
+      if (!L) return dx
+      return Math.max(L.minDragX, Math.min(L.maxDragX, dx))
+    }
+
+    const isPointInActiveTab = (clientX, clientY) => {
+      const li = itemRefs.current[committedIndex]
+      if (!li) return false
+      const r = li.getBoundingClientRect()
+      return (
+        clientX >= r.left && clientX <= r.right && clientY >= r.top && clientY <= r.bottom
+      )
+    }
+
+    const isOnDroplet = (target) => {
+      const layer = dragLayerRef.current
+      if (!layer || !target) return false
+      return layer === target || layer.contains(target)
+    }
+
+    const beginPending = (pointerId, clientX, clientY) => {
+      pendingDrag.current = {
+        pointerId,
+        pointerX: clientX,
+        pointerY: clientY,
+        baseX: offsetX.get(),
+        touch: pointerId > 100000,
+      }
+    }
+
+    const shouldStartDrag = (dx, dy) =>
+      Math.abs(dx) >= DRAG_THRESHOLD_PX && Math.abs(dx) >= Math.abs(dy) * 0.85
+
+    const applyMove = (clientX, clientY, e) => {
+      const pending = pendingDrag.current
+      if (!pending) return
+
+      const dx = clientX - pending.pointerX
+      const dy = clientY - pending.pointerY
+
+      if (!dragGesture.current.active) {
+        if (!shouldStartDrag(dx, dy)) return
+        dragGesture.current = {
+          active: true,
+          pointerX: pending.pointerX,
+          baseX: pending.baseX,
+        }
+        setDragging(true)
+      }
+
+      const totalX = clientX - dragGesture.current.pointerX + dragGesture.current.baseX
+      offsetX.set(clampDrag(totalX))
+      e.preventDefault()
+      previewAtPointer()
+    }
+
+    const finish = (pointerId, e) => {
+      const pending = pendingDrag.current
+      if (!pending || pending.pointerId !== pointerId) return
+      if (dragGesture.current.active) {
+        e.preventDefault()
+        e.stopPropagation()
+        dragGesture.current.active = false
+        setDragging(false)
+        commitFromDrag()
+      }
+      pendingDrag.current = null
+    }
+
+    const onDownCapture = (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      if (pendingDrag.current?.touch && e.pointerType === 'touch') return
+      const ok =
+        isPointInActiveTab(e.clientX, e.clientY) || isOnDroplet(e.target)
+      if (!ok) return
+      beginPending(e.pointerId, e.clientX, e.clientY)
+    }
+
+    const onMoveCapture = (e) => {
+      const pending = pendingDrag.current
+      if (!pending || pending.pointerId !== e.pointerId) return
+      applyMove(e.clientX, e.clientY, e)
+    }
+
+    const onUpCapture = (e) => {
+      finish(e.pointerId, e)
+    }
+
+    const onTouchStart = (e) => {
+      const t = e.changedTouches[0]
+      if (!t) return
+      const ok =
+        isPointInActiveTab(t.clientX, t.clientY) || isOnDroplet(e.target)
+      if (!ok) return
+      beginPending(t.identifier + 100000, t.clientX, t.clientY)
+    }
+
+    const onTouchMove = (e) => {
+      const pending = pendingDrag.current
+      if (!pending?.touch) return
+      const touchId = pending.pointerId - 100000
+      const t = [...e.touches].find((touch) => touch.identifier === touchId)
+      if (!t) return
+      applyMove(t.clientX, t.clientY, e)
+    }
+
+    const onTouchEnd = (e) => {
+      const pending = pendingDrag.current
+      if (!pending?.touch) return
+      const t = [...e.changedTouches].find((touch) => touch.identifier + 100000 === pending.pointerId)
+      if (!t) return
+      finish(pending.pointerId, e)
+    }
+
+    const opts = { capture: true, passive: false }
+    row.addEventListener('pointerdown', onDownCapture, opts)
+    row.addEventListener('pointermove', onMoveCapture, opts)
+    row.addEventListener('pointerup', onUpCapture, opts)
+    row.addEventListener('pointercancel', onUpCapture, opts)
+    row.addEventListener('touchstart', onTouchStart, opts)
+    row.addEventListener('touchmove', onTouchMove, opts)
+    row.addEventListener('touchend', onTouchEnd, opts)
+    row.addEventListener('touchcancel', onTouchEnd, opts)
+
+    return () => {
+      row.removeEventListener('pointerdown', onDownCapture, opts)
+      row.removeEventListener('pointermove', onMoveCapture, opts)
+      row.removeEventListener('pointerup', onUpCapture, opts)
+      row.removeEventListener('pointercancel', onUpCapture, opts)
+      row.removeEventListener('touchstart', onTouchStart, opts)
+      row.removeEventListener('touchmove', onTouchMove, opts)
+      row.removeEventListener('touchend', onTouchEnd, opts)
+      row.removeEventListener('touchcancel', onTouchEnd, opts)
+    }
+  }, [
+    committedIndex,
+    commitFromDrag,
+    itemRefs,
+    offsetX,
+    previewAtPointer,
+    reduceMotion,
+    rowRef,
+  ])
 
   if (!layout) return null
 
@@ -159,6 +318,13 @@ export function TabDockDragPill({
     <motion.div
       ref={dragLayerRef}
       className="tab-dock-pill-drag-layer tab-dock-pill-draggable pointer-events-auto absolute z-[4]"
+      style={{
+        left: layout.hitLeft,
+        top: layout.hitTop,
+        width: layout.hitWidth,
+        height: layout.hitHeight,
+        x: offsetX,
+      }}
       animate={{
         left: layout.hitLeft,
         top: layout.hitTop,
@@ -166,20 +332,6 @@ export function TabDockDragPill({
         height: layout.hitHeight,
       }}
       transition={slideSpring}
-      drag={reduceMotion ? false : 'x'}
-      dragMomentum={false}
-      dragElastic={0.82}
-      dragTransition={{
-        bounceStiffness: 125,
-        bounceDamping: 9,
-        power: 0.22,
-        timeConstant: 420,
-      }}
-      dragConstraints={dragConstraints}
-      onDragStart={() => setDragging(true)}
-      onDrag={previewAtPointer}
-      onDragEnd={commitFromDrag}
-      whileDrag={{ cursor: 'grabbing' }}
       aria-label="拖动水滴切换页面"
       role="slider"
     >
@@ -191,15 +343,18 @@ export function TabDockDragPill({
           height: layout.height,
           flexShrink: 0,
           boxShadow: dragging
-            ? `0 14px 32px rgba(${accent.glow},0.28), inset 0 2px 0 rgba(255,255,255,0.95), inset 0 -10px 20px rgba(255,255,255,0.5)`
-            : `0 12px 28px rgba(${accent.glow},0.22), inset 0 2px 0 rgba(255,255,255,0.92), inset 0 -8px 16px rgba(255,255,255,0.4)`,
+            ? `0 18px 40px rgba(${accent.glow},0.22), inset 0 2px 0 rgba(255,255,255,0.9), inset 0 -12px 24px rgba(255,255,255,0.45)`
+            : `0 14px 36px rgba(${accent.glow},0.18), inset 0 2px 0 rgba(255,255,255,0.88), inset 0 -10px 20px rgba(255,255,255,0.38)`,
         }}
-        initial={reduceMotion ? false : { scaleX: 1.2, scaleY: 0.82, x: 0 }}
-        animate={reduceMotion ? {} : { scaleX: 1, scaleY: 1, x: 0 }}
-        whileDrag={{
-          scaleX: 1.16,
-          scaleY: 0.84,
-        }}
+        initial={reduceMotion ? false : { scaleX: 1.28, scaleY: 0.74 }}
+        animate={
+          reduceMotion
+            ? {}
+            : {
+                scaleX: dragging ? 1.2 : 1,
+                scaleY: dragging ? 0.8 : 1,
+              }
+        }
         transition={landSpring}
         aria-hidden
       />

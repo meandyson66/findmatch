@@ -79,7 +79,9 @@ export function BottomNav() {
                 ref={(el) => {
                   dockItemRefs.current[index] = el
                 }}
-                className="tab-dock-cell relative z-[20] min-w-0 flex-1"
+                className={`tab-dock-cell relative z-[20] min-w-0 flex-1 ${
+                  state.tab === id ? 'tab-dock-cell--active-dock' : ''
+                }`}
               >
                 <motion.button
                   type="button"

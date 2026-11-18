@@ -230,11 +230,15 @@ body {
     align-items: center;
     justify-content: center;
     touch-action: none;
-    cursor: grab;
     will-change: transform, left;
     transform-origin: center center;
     background: transparent !important;
     box-shadow: none !important;
+    pointer-events: none;
+  }
+
+  .tab-dock-cell--active-dock {
+    touch-action: pan-y pinch-zoom;
   }
 
   .tab-dock-pill-drag-layer:active {
@@ -250,30 +254,31 @@ body {
   .tab-dock-pill {
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.24);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     background: linear-gradient(
       158deg,
-      rgba(78, 68, 120, 0.82) 0%,
-      rgba(48, 72, 98, 0.68) 52%,
-      rgba(64, 52, 96, 0.74) 100%
+      rgba(78, 68, 120, 0.62) 0%,
+      rgba(48, 72, 98, 0.5) 52%,
+      rgba(64, 52, 96, 0.56) 100%
     );
-    backdrop-filter: blur(26px) saturate(195%);
-    -webkit-backdrop-filter: blur(26px) saturate(195%);
+    backdrop-filter: blur(36px) saturate(175%);
+    -webkit-backdrop-filter: blur(36px) saturate(175%);
   }
 
   .tab-dock-pill-visual {
-    opacity: 0.92;
+    opacity: 0.86;
+    filter: blur(0.2px);
   }
 
   .tab-dock-pill-droplet {
     border-radius: 50%;
     clip-path: ellipse(88% 94% at 50% 50%);
     box-shadow:
-      0 10px 28px rgba(15, 23, 42, 0.14),
-      0 4px 16px rgba(62, 181, 117, 0.14),
-      inset 0 2px 0 rgba(255, 255, 255, 0.92),
-      inset 0 -10px 22px rgba(255, 255, 255, 0.42);
-    animation: tab-droplet-idle-pulse 3.6s ease-in-out infinite;
+      0 14px 36px rgba(15, 23, 42, 0.1),
+      0 6px 22px rgba(62, 181, 117, 0.1),
+      inset 0 2px 0 rgba(255, 255, 255, 0.85),
+      inset 0 -12px 26px rgba(255, 255, 255, 0.35);
+    animation: tab-droplet-idle-pulse 4.8s ease-in-out infinite;
   }
 
   .tab-dock-pill-droplet::before {
@@ -305,10 +310,10 @@ body {
   @keyframes tab-droplet-idle-pulse {
     0%,
     100% {
-      filter: brightness(1);
+      filter: brightness(1) saturate(1);
     }
     50% {
-      filter: brightness(1.06);
+      filter: brightness(1.04) saturate(1.05);
     }
   }
 
