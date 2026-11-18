@@ -1,8 +1,9 @@
 {
-  "versionName": "0.1.3",
-  "versionCode": 4,
-  "releaseNotes": "首页液态焦点与四窗交流广场；会员橱窗、红娘水滴卡；页脚与体验优化。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.3/app-release.apk",
+  "versionName": "0.1.4",
+  "versionCode": 5,
+  "releaseNotes": "修复安卓无法检测更新：改为从线上下发版本信息；下载 APK 调起系统浏览器。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.4/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
-  "checkedAt": 1795004701973
+  "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json",
+  "checkedAt": 1795004991601
 }

@@ -6,6 +6,7 @@ import {
   isUpdateDismissed,
   markUpdateChecked,
   shouldRunAutoCheck,
+  isAndroidApp,
 } from '../utils/updateCheck'
 
 export function useAppUpdate() {
@@ -39,7 +40,13 @@ export function useAppUpdate() {
         if (!isNew && !silent) setError('已是最新版本')
         return data
       } catch {
-        if (!silent) setError('检查失败，请稍后再试')
+        if (!silent) {
+          setError(
+            isAndroidApp()
+              ? '检查失败，请确认网络正常后重试'
+              : '检查失败，请稍后再试'
+          )
+        }
         return null
       } finally {
         setChecking(false)

@@ -2,6 +2,8 @@ package com.meandyson.findmatch;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -43,6 +45,25 @@ public class MainActivity extends Activity {
                     public WebResourceResponse shouldInterceptRequest(
                             WebView view, WebResourceRequest request) {
                         return assetLoader.shouldInterceptRequest(request.getUrl());
+                    }
+
+                    @Override
+                    public boolean shouldOverrideUrlLoading(
+                            WebView view, WebResourceRequest request) {
+                        Uri uri = request.getUrl();
+                        if (uri == null) {
+                            return false;
+                        }
+                        String host = uri.getHost();
+                        if (host != null
+                                && (host.contains("github.com")
+                                        || host.contains("github.io")
+                                        || host.contains("raw.githubusercontent.com"))) {
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            startActivity(intent);
+                            return true;
+                        }
+                        return false;
                     }
 
                     @Override

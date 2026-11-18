@@ -5,11 +5,18 @@ const LAST_CHECK_KEY = 'findmatch-update-last-check'
 
 const CHECK_INTERVAL_MS = 1000 * 60 * 30
 
+/** 安卓 APK 内 version.json 与安装包同源，无法判断是否有新版本，必须拉线上 */
+const ANDROID_VERSION_CHECK_URL =
+  'https://meandyson66.github.io/findmatch/version.json'
+
 export function isAndroidApp() {
   return typeof document !== 'undefined' && document.documentElement.classList.contains('android-app')
 }
 
 export function versionCheckUrl() {
+  if (isAndroidApp()) {
+    return ANDROID_VERSION_CHECK_URL
+  }
   const base = import.meta.env.BASE_URL || '/'
   const normalized = base.endsWith('/') ? base : `${base}/`
   return `${normalized}version.json`
@@ -68,6 +75,10 @@ export function openUpdateTarget(remote) {
   const url =
     (isAndroidApp() && remote.apkUrl) || remote.releasesPage || remote.apkUrl || ''
   if (!url) return
+  if (isAndroidApp()) {
+    window.location.href = url
+    return
+  }
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 

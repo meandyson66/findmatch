@@ -9,6 +9,7 @@ const out = {
   releaseNotes: manifest.releaseNotes ?? '',
   apkUrl: manifest.apkUrl ?? manifest.releasesPage,
   releasesPage: manifest.releasesPage ?? '',
+  versionCheckUrl: manifest.versionCheckUrl ?? '',
   checkedAt: Date.now(),
 }
 
