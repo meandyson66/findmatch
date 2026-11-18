@@ -5,7 +5,7 @@ import { useHorizontalTabSwipe } from '../hooks/useHorizontalTabSwipe'
 import { TAB_ACCENT, TABS, shiftTabId } from './nav/tabConfig'
 import { TabDockIcon } from './nav/TabDockIcon'
 
-const spring = { type: 'spring', stiffness: 480, damping: 26, mass: 0.82 }
+const spring = { type: 'spring', stiffness: 520, damping: 34, mass: 0.85 }
 
 export function BottomNav() {
   const { state, patch } = useApp()
@@ -82,7 +82,7 @@ export function BottomNav() {
                   {active && (
                     <motion.span
                       layoutId="tab-active-pill"
-                      className="tab-dock-pill tab-dock-pill-oval absolute inset-x-0.5 bottom-0.5 top-0.5"
+                      className="tab-dock-pill absolute inset-x-0.5 bottom-0 top-0"
                       style={{
                         boxShadow: `0 12px 28px rgba(${accent.glow},0.22), inset 0 2px 0 rgba(255,255,255,0.92), inset 0 -8px 16px rgba(255,255,255,0.4)`,
                       }}

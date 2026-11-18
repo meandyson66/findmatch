@@ -3,8 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useHorizontalTabSwipe } from '../../hooks/useHorizontalTabSwipe'
 import { MAIN_TAB_IDS, shiftTabId, tabIndex } from './tabConfig'
 
-const slideSpring = { type: 'spring', stiffness: 300, damping: 22, mass: 0.85 }
-const settleSpring = { type: 'spring', stiffness: 420, damping: 16, mass: 0.75 }
+const spring = { type: 'spring', stiffness: 420, damping: 38, mass: 0.92 }
 
 export function MainTabPager({ tab, onTabChange, enabled, children }) {
   const reduceMotion = useReducedMotion()
@@ -49,22 +48,19 @@ export function MainTabPager({ tab, onTabChange, enabled, children }) {
 
   const variants = {
     enter: (d) => ({
-      x: d > 0 ? '78%' : '-78%',
-      scaleX: reduceMotion ? 1 : 0.86,
-      scaleY: reduceMotion ? 1 : 0.93,
-      opacity: 0.88,
+      x: d > 0 ? '38%' : '-38%',
+      opacity: 0,
+      filter: reduceMotion ? 'none' : 'blur(6px)',
     }),
     center: {
       x: 0,
-      scaleX: 1,
-      scaleY: 1,
       opacity: 1,
+      filter: 'blur(0px)',
     },
     exit: (d) => ({
-      x: d > 0 ? '-62%' : '62%',
-      scaleX: reduceMotion ? 1 : 0.9,
-      scaleY: reduceMotion ? 1 : 0.95,
-      opacity: 0.75,
+      x: d > 0 ? '-32%' : '32%',
+      opacity: 0,
+      filter: reduceMotion ? 'none' : 'blur(4px)',
     }),
   }
 
@@ -78,18 +74,10 @@ export function MainTabPager({ tab, onTabChange, enabled, children }) {
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{
-            x: slideSpring,
-            scaleX: settleSpring,
-            scaleY: settleSpring,
-            opacity: { duration: 0.22 },
-          }}
-          className="tab-pager-oval-shell absolute inset-x-2 top-0 bottom-0 flex min-h-0 flex-col overflow-hidden"
-          style={{ transformOrigin: '50% 50%' }}
+          transition={spring}
+          className="absolute inset-0 flex h-full min-h-0 flex-col overflow-hidden"
         >
-          <div className="tab-pager-oval-inner flex min-h-0 flex-1 flex-col overflow-hidden">
-            {children}
-          </div>
+          {children}
         </motion.div>
       </AnimatePresence>
     </div>

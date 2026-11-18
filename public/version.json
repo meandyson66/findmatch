@@ -1,9 +1,9 @@
 {
-  "versionName": "0.1.11",
-  "versionCode": 12,
-  "releaseNotes": "修复安卓打开白屏（打包资源路径被 Pages 构建覆盖）；Tab 椭圆滑动与弹性切换。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.11/app-release.apk",
+  "versionName": "0.1.12",
+  "versionCode": 13,
+  "releaseNotes": "取消 Tab 椭圆胶囊与弹性缩放，恢复全屏平移切换与原有底栏高亮；含 v0.1.11 白屏修复。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.12/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json",
-  "checkedAt": 1795018864572
+  "checkedAt": 1795019160196
 }
