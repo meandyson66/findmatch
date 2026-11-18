@@ -59,8 +59,16 @@ export function BottomNav() {
 
         <ul
           ref={dockRowRef}
-          className="relative z-[3] flex items-stretch justify-between px-1 py-1"
+          className="relative flex items-stretch justify-between px-1 py-1"
         >
+          <TabDockDragPill
+            rowRef={dockRowRef}
+            itemRefs={dockItemRefs}
+            visualId={visualTab}
+            committedId={state.tab}
+            onSelect={(id) => patch({ tab: id })}
+            onDragPreview={setDragPreviewId}
+          />
           {TABS.map(({ id, label }, index) => {
             const active = visualTab === id
             const accent = TAB_ACCENT[id]
@@ -71,7 +79,7 @@ export function BottomNav() {
                 ref={(el) => {
                   dockItemRefs.current[index] = el
                 }}
-                className="tab-dock-cell relative z-[5] min-w-0 flex-1"
+                className="tab-dock-cell relative z-[20] min-w-0 flex-1"
               >
                 <motion.button
                   type="button"
@@ -82,7 +90,7 @@ export function BottomNav() {
                   style={{ transformStyle: 'preserve-3d' }}
                 >
                   <motion.span
-                    className="tab-dock-icon-stage pointer-events-auto relative z-20 flex h-8 w-8 items-center justify-center"
+                    className="tab-dock-icon-stage pointer-events-auto relative z-[30] flex h-8 w-8 items-center justify-center"
                     whileTap={reduceMotion ? undefined : { scale: 0.9 }}
                   >
                     {active && !reduceMotion && (
@@ -137,7 +145,7 @@ export function BottomNav() {
 
                   <motion.span
                     key={active ? `${id}-label-${tabSwitchSeq}` : `${id}-label`}
-                    className="pointer-events-none relative z-20 -mt-px max-w-full truncate px-0.5 text-[10px] leading-tight"
+                    className="pointer-events-none relative z-[30] -mt-px max-w-full truncate px-0.5 text-[10px] leading-tight"
                     initial={active && !reduceMotion ? { opacity: 0.45, y: 5, scale: 0.92 } : false}
                     animate={
                       reduceMotion
@@ -166,14 +174,6 @@ export function BottomNav() {
               </li>
             )
           })}
-          <TabDockDragPill
-            rowRef={dockRowRef}
-            itemRefs={dockItemRefs}
-            visualId={visualTab}
-            committedId={state.tab}
-            onSelect={(id) => patch({ tab: id })}
-            onDragPreview={setDragPreviewId}
-          />
         </ul>
       </nav>
     </div>

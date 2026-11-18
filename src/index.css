@@ -225,15 +225,26 @@ body {
     pointer-events: auto;
   }
 
-  .tab-dock-pill-draggable {
+  .tab-dock-pill-drag-layer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     touch-action: none;
     cursor: grab;
     will-change: transform, left;
     transform-origin: center center;
+    background: transparent !important;
+    box-shadow: none !important;
   }
 
-  .tab-dock-pill-draggable:active {
+  .tab-dock-pill-drag-layer:active {
     cursor: grabbing;
+  }
+
+  .tab-dock-pill-draggable {
+    touch-action: none;
+    cursor: grab;
+    transform-origin: center center;
   }
 
   .tab-dock-pill {
@@ -248,6 +259,10 @@ body {
     );
     backdrop-filter: blur(26px) saturate(195%);
     -webkit-backdrop-filter: blur(26px) saturate(195%);
+  }
+
+  .tab-dock-pill-visual {
+    opacity: 0.92;
   }
 
   .tab-dock-pill-droplet {

@@ -2,7 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { tabIndex } from './tabConfig'
 
-const spring = { type: 'spring', stiffness: 420, damping: 38, mass: 0.92 }
+const spring = { type: 'spring', stiffness: 360, damping: 28, mass: 0.98 }
 
 export function MainTabPager({ tab, children }) {
   const reduceMotion = useReducedMotion()
