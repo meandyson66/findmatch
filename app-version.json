@@ -1,8 +1,8 @@
 {
-  "versionName": "0.1.12",
-  "versionCode": 13,
-  "releaseNotes": "取消 Tab 椭圆胶囊与弹性缩放，恢复全屏平移切换与原有底栏高亮；含 v0.1.11 白屏修复。",
-  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.12/app-release.apk",
+  "versionName": "0.1.13",
+  "versionCode": 14,
+  "releaseNotes": "前 5 位固定会员昵称发光闪烁；修复安卓检查更新误读本地 version 导致总提示已是最新（改为拉 GitHub Pages / 主分支并移除包内 version.json）。",
+  "apkUrl": "https://github.com/meandyson66/findmatch/releases/download/v0.1.13/app-release.apk",
   "releasesPage": "https://github.com/meandyson66/findmatch/releases/latest",
   "versionCheckUrl": "https://meandyson66.github.io/findmatch/version.json"
 }

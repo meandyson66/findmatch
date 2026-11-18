@@ -10,8 +10,8 @@ android {
         applicationId "com.meandyson.findmatch"
         minSdk 26
         targetSdk 35
-        versionCode 13
-        versionName "0.1.12"
+        versionCode 14
+        versionName "0.1.13"
     }
 
     buildTypes {
@@ -28,7 +28,9 @@ android {
 }
 
 tasks.register("syncWeb", Copy) {
-    from("${rootDir}/../dist-android")
+    from("${rootDir}/../dist-android") {
+        exclude "version.json"
+    }
     into("${projectDir}/src/main/assets")
     doFirst {
         def webDist = file("${rootDir}/../dist-android")

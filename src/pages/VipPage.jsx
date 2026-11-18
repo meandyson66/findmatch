@@ -8,6 +8,7 @@ import {
   buildVipMemberList,
   findVipMemberById,
   findVipMemberProfile,
+  isVipFeaturedFixedId,
 } from '../data/vipMembers'
 import { chatIdForRadar } from '../data/storage'
 import { getVipPerks } from '../data/vip'
@@ -217,6 +218,7 @@ export function VipPage({ onOpenChat }) {
           showToast(profileFollowing ? '已取消关注' : '关注成功')
         }}
         greeted={greetProfileId ? isRadarUnlocked(greetProfileId) : false}
+        glowNickname={profileMemberId ? isVipFeaturedFixedId(profileMemberId) : false}
       />
 
       <SoulQuizModal

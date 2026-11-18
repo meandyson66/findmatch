@@ -7,12 +7,20 @@ const LAST_CHECK_KEY = 'findmatch-update-last-check'
 
 const CHECK_INTERVAL_MS = 1000 * 60 * 30
 
-/** 安卓 APK 内 version.json 与安装包同源，无法判断是否有新版本，必须拉线上 */
+/** 安卓必须拉远端；安装包内不再保留 version.json，避免误读本地副本 */
 const ANDROID_VERSION_CHECK_URL =
   'https://meandyson66.github.io/findmatch/version.json'
+const ANDROID_VERSION_FALLBACK_URL =
+  'https://raw.githubusercontent.com/meandyson66/findmatch/main/public/version.json'
 
 export function isAndroidApp() {
-  return typeof document !== 'undefined' && document.documentElement.classList.contains('android-app')
+  if (typeof window === 'undefined') return false
+  if (document.documentElement.classList.contains('android-app')) return true
+  try {
+    return new URL(window.location.href).hostname === 'appassets.androidplatform.net'
+  } catch {
+    return false
+  }
 }
 
 export function versionCheckUrl() {
@@ -24,13 +32,43 @@ export function versionCheckUrl() {
   return `${normalized}version.json`
 }
 
-export async function fetchRemoteVersion() {
-  const url = `${versionCheckUrl()}?t=${Date.now()}`
-  const res = await fetch(url, { cache: 'no-store' })
+function versionCheckUrls() {
+  if (isAndroidApp()) {
+    const bust = `t=${Date.now()}`
+    return [
+      `${ANDROID_VERSION_CHECK_URL}?${bust}`,
+      `${ANDROID_VERSION_FALLBACK_URL}?${bust}`,
+    ]
+  }
+  return [`${versionCheckUrl()}?t=${Date.now()}`]
+}
+
+async function fetchVersionFromUrl(url) {
+  const res = await fetch(url, {
+    cache: 'no-store',
+    headers: {
+      Accept: 'application/json',
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
+  })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const data = await res.json()
   if (typeof data.versionCode !== 'number') throw new Error('invalid version.json')
   return data
+}
+
+export async function fetchRemoteVersion() {
+  const urls = versionCheckUrls()
+  let lastErr
+  for (const url of urls) {
+    try {
+      return await fetchVersionFromUrl(url)
+    } catch (err) {
+      lastErr = err
+    }
+  }
+  throw lastErr ?? new Error('version check failed')
 }
 
 export function hasNewVersion(remote) {
@@ -92,4 +130,17 @@ export function openGithubRepo() {
 
 export function getCurrentVersionLabel() {
   return `v${APP_VERSION_NAME} (${APP_VERSION_CODE})`
+}
+
+/** 手动检查无新版本时的提示文案 */
+export function formatAlreadyLatestMessage(remote) {
+  if (!remote?.versionName) return '已是最新版本'
+  const remoteLabel = `v${remote.versionName} (${remote.versionCode})`
+  if (remote.versionCode > APP_VERSION_CODE) {
+    return `线上有更新 ${remoteLabel}，请重试或前往 GitHub Releases`
+  }
+  if (remote.versionCode < APP_VERSION_CODE) {
+    return `当前 ${getCurrentVersionLabel()} 较新，线上 ${remoteLabel}`
+  }
+  return `已是最新版本，与线上一致 ${remoteLabel}`
 }

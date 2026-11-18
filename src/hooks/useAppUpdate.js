@@ -7,6 +7,7 @@ import {
   markUpdateChecked,
   shouldRunAutoCheck,
   isAndroidApp,
+  formatAlreadyLatestMessage,
 } from '../utils/updateCheck'
 
 export function useAppUpdate() {
@@ -15,12 +16,12 @@ export function useAppUpdate() {
   const [checking, setChecking] = useState(false)
   const [error, setError] = useState('')
 
-  const applyRemote = useCallback((data) => {
+  const applyRemote = useCallback((data, { ignoreDismiss = false } = {}) => {
     if (!hasNewVersion(data)) {
       setRemote(null)
       return false
     }
-  if (isUpdateDismissed(data.versionCode)) {
+    if (!ignoreDismiss && isUpdateDismissed(data.versionCode)) {
       setRemote(null)
       return false
     }
@@ -35,9 +36,10 @@ export function useAppUpdate() {
       try {
         const data = await fetchRemoteVersion()
         markUpdateChecked()
-        const isNew = applyRemote(data)
+        const ignoreDismiss = openSheetOnNew && !silent
+        const isNew = applyRemote(data, { ignoreDismiss })
         if (isNew && openSheetOnNew) setSheetOpen(true)
-        if (!isNew && !silent) setError('已是最新版本')
+        if (!isNew && !silent) setError(formatAlreadyLatestMessage(data))
         return data
       } catch {
         if (!silent) {
@@ -57,7 +59,10 @@ export function useAppUpdate() {
 
   useEffect(() => {
     if (!shouldRunAutoCheck()) return
-    checkForUpdate({ silent: true, openSheetOnNew: true })
+    const t = window.setTimeout(() => {
+      checkForUpdate({ silent: true, openSheetOnNew: true })
+    }, 0)
+    return () => window.clearTimeout(t)
   }, [checkForUpdate])
 
   const dismiss = useCallback(() => {

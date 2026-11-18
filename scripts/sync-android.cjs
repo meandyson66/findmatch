@@ -36,5 +36,15 @@ function copyDir(src, dest) {
   }
 }
 
+for (const root of [dist, assets]) {
+  const versionJson = path.join(root, 'version.json')
+  if (fs.existsSync(versionJson)) fs.unlinkSync(versionJson)
+}
+
 copyDir(dist, assets)
+
+const bundledVersionJson = path.join(assets, 'version.json')
+if (fs.existsSync(bundledVersionJson)) fs.unlinkSync(bundledVersionJson)
+console.log('Android assets omit version.json (updates fetch remote only)')
+
 console.log(`Synced ${dist} -> ${assets}`)

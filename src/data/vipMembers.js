@@ -69,6 +69,12 @@ export const VIP_FEATURED_FIXED = [
   },
 ]
 
+export const VIP_FEATURED_FIXED_IDS = new Set(VIP_FEATURED_FIXED.map((m) => m.id))
+
+export function isVipFeaturedFixedId(id) {
+  return VIP_FEATURED_FIXED_IDS.has(id)
+}
+
 /** 随机池：白银 / 黄金 / 钻石等付费会员 */
 export const VIP_MEMBER_POOL = [
   {

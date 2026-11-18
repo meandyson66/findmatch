@@ -2,8 +2,18 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MapPin, UserPlus, X } from 'lucide-react'
 import { ProfileInfoGrid } from '../ProfileInfoGrid'
 import { MomoAvatar } from '../MomoAvatar'
+import { VipFeaturedGlowName } from '../vip/VipFeaturedGlowName'
 
-export function ProfileSheet({ user, open, onClose, onGreet, isFollowing, onToggleFollow, greeted }) {
+export function ProfileSheet({
+  user,
+  open,
+  onClose,
+  onGreet,
+  isFollowing,
+  onToggleFollow,
+  greeted,
+  glowNickname = false,
+}) {
   return (
     <AnimatePresence>
       {open && user && (
@@ -30,8 +40,14 @@ export function ProfileSheet({ user, open, onClose, onGreet, isFollowing, onTogg
               imageUrl={user.avatarImage}
             />
             <div>
-              <h2 className="text-lg font-semibold text-momo-text">
-                {user.nickname} · {user.age}
+              <h2 className="flex flex-wrap items-baseline gap-1 text-lg font-semibold text-momo-text">
+                <VipFeaturedGlowName
+                  nickname={user.nickname}
+                  featured={glowNickname}
+                  accent={user.accent}
+                  className="text-lg font-semibold"
+                />
+                <span>· {user.age}</span>
               </h2>
               <p className="text-sm text-momo-sub">{user.gender}</p>
               <p className="mt-1 flex items-center gap-1 text-xs text-momo-sub">

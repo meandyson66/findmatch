@@ -16,6 +16,13 @@
     <title>寻伴 FindMatch · 附近交友 · GitHub findmatch</title>
   </head>
   <body>
+    <script>
+      try {
+        if (location.hostname === 'appassets.androidplatform.net') {
+          document.documentElement.classList.add('android-app')
+        }
+      } catch (_) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

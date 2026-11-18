@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import { VipMarqueeAvatar } from './VipMarqueeAvatar'
 import { VipBadge } from '../VipBadge'
+import { VipFeaturedGlowName } from './VipFeaturedGlowName'
 function summaryLine(m) {
   return [
     `${m.gender} ${m.age}`,
@@ -21,7 +22,12 @@ export function VipMemberCard({ member, onPress }) {
       <VipMarqueeAvatar member={member} size={46} ring />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
-          <span className="truncate text-sm font-medium text-momo-text">{member.nickname}</span>
+          <VipFeaturedGlowName
+            nickname={member.nickname}
+            featured={Boolean(member.fixed)}
+            accent={member.accent}
+            className="truncate text-sm font-medium"
+          />
           <VipBadge level={member.vipLevel} />
         </div>
         <p className="mt-0.5 truncate text-[11px] text-momo-sub">{summaryLine(member)}</p>
